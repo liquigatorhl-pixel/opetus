@@ -1,0 +1,929 @@
+{
+  "firstLayout": "LanguageSelection",
+  "gdVersion": {
+    "build": 99,
+    "major": 5,
+    "minor": 0,
+    "revision": 0
+  },
+  "properties": {
+    "adaptGameResolutionAtRuntime": true,
+    "folderProject": false,
+    "orientation": "landscape",
+    "packageName": "com.medical.languagelearning",
+    "projectFile": "game.json",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
+    "useExternalSourceFiles": false,
+    "version": "1.0.0",
+    "name": "Medical Language Learning Game",
+    "description": "Learn medical vocabulary in multiple languages",
+    "author": "Your Name",
+    "windowWidth": 640,
+    "windowHeight": 480,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 20,
+    "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
+    "watermark": {
+      "showWatermark": true
+    },
+    "authorIds": [],
+    "categories": [],
+    "playableDevices": [],
+    "extensionProperties": [],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "file": "room_kitchen.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "room_kitchen.png",
+        "smoothed": true,
+        "userAdded": true,
+        "origin": {
+          "identifier": "room_kitchen.png",
+          "name": "gdevelop-asset-store"
+        }
+      },
+      {
+        "file": "room_patient.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "room_patient.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "images/mario_idle_right.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "mario_idle_right",
+        "smoothed": false,
+        "userAdded": true
+      },
+      {
+        "file": "images/mario_walk1_right.png",
+        "kind": "image",
+        "name": "mario_walk1_right",
+        "smoothed": false,
+        "userAdded": true
+      },
+      {
+        "file": "images/mario_walk2_right.png",
+        "kind": "image",
+        "name": "mario_walk2_right",
+        "smoothed": false,
+        "userAdded": true
+      },
+      {
+        "file": "images/mario_walk3_right.png",
+        "kind": "image",
+        "name": "mario_walk3_right",
+        "smoothed": false,
+        "userAdded": true
+      },
+      {
+        "file": "images/mario_idle_left.png",
+        "kind": "image",
+        "name": "mario_idle_left",
+        "smoothed": false,
+        "userAdded": true
+      },
+      {
+        "file": "images/mario_walk1_left.png",
+        "kind": "image",
+        "name": "mario_walk1_left",
+        "smoothed": false,
+        "userAdded": true
+      },
+      {
+        "file": "images/mario_walk2_left.png",
+        "kind": "image",
+        "name": "mario_walk2_left",
+        "smoothed": false,
+        "userAdded": true
+      },
+      {
+        "file": "images/mario_walk3_left.png",
+        "kind": "image",
+        "name": "mario_walk3_left",
+        "smoothed": false,
+        "userAdded": true
+      },
+      {
+        "file": "npc_patient1.png",
+        "kind": "image",
+        "name": "npc_patient1",
+        "smoothed": false,
+        "userAdded": true
+      },
+      {
+        "file": "npc_patient2.png",
+        "kind": "image",
+        "name": "npc_patient2",
+        "smoothed": false,
+        "userAdded": true
+      },
+      {
+        "file": "npc_patient3.png",
+        "kind": "image",
+        "name": "npc_patient3",
+        "smoothed": false,
+        "userAdded": true
+      },
+      {
+        "file": "npc_patient4.png",
+        "kind": "image",
+        "name": "npc_patient4",
+        "smoothed": false,
+        "userAdded": true
+      },
+      {
+        "file": "images/refrigerator.png",
+        "kind": "image",
+        "name": "refrigerator",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "images/bed.png",
+        "kind": "image",
+        "name": "bed",
+        "smoothed": true,
+        "userAdded": true
+      }
+    ],
+    "resourceFolders": []
+  },
+  "objects": [],
+  "objectsGroups": [],
+  "variables": [
+    {
+      "name": "CurrentRoom",
+      "type": "string",
+      "value": "kitchen"
+    },
+    {
+      "name": "SelectedLanguage1",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "name": "SelectedLanguage2",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "name": "NPCSize",
+      "type": "number",
+      "value": 48
+    }
+  ],
+  "layouts": [
+    {
+      "b": 32,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "LanguageSelection",
+      "name": "LanguageSelection",
+      "r": 32,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "Language Selection",
+      "v": 32,
+      "uiSettings": {
+        "grid": false,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridColor": "10401023",
+        "gridAlpha": 0.8,
+        "snap": false,
+        "zoomFactor": 1,
+        "windowMask": false
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [],
+      "objects": [
+        {
+          "name": "Background",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Default",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "room_kitchen.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Title",
+          "type": "TextObject::Text",
+          "variables": [],
+          "behaviors": [],
+          "string": "🏥 Medical Language Learning",
+          "fontSize": 32,
+          "fontName": "Arial",
+          "bold": true,
+          "italic": false,
+          "underlined": false,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          }
+        },
+        {
+          "name": "InstructionText",
+          "type": "TextObject::Text",
+          "variables": [],
+          "behaviors": [],
+          "string": "Choose 2 languages to learn medical vocabulary",
+          "fontSize": 18,
+          "fontName": "Arial",
+          "bold": false,
+          "italic": false,
+          "underlined": false,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          }
+        }
+      ],
+      "events": [],
+      "layers": [
+        {
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    },
+    {
+      "b": 32,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "Kitchen",
+      "name": "Kitchen",
+      "r": 32,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "Kitchen",
+      "v": 32,
+      "uiSettings": {
+        "grid": true,
+        "gridType": "rectangular",
+        "gridWidth": 20,
+        "gridHeight": 20,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridColor": "10401023",
+        "gridAlpha": 0.8,
+        "snap": true,
+        "zoomFactor": 1,
+        "windowMask": false
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [],
+      "objects": [
+        {
+          "name": "RoomBackground",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "kitchen",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "room_kitchen.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "patient",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "room_patient.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Player",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "Speed",
+              "type": "number",
+              "value": 0.5
+            }
+          ],
+          "behaviors": [
+            {
+              "name": "TopDownMovement",
+              "type": "TopDownMovementBehavior::TopDownMovementBehavior",
+              "acceleration": 400,
+              "deceleration": 800,
+              "maxSpeed": 100,
+              "angularMaxSpeed": 180,
+              "rotateObject": false,
+              "angleOffset": 0,
+              "ignoreDefaultControls": false,
+              "movementAngleOffset": 0,
+              "viewpoint": "TopDown",
+              "customIsometryAngle": 30,
+              "stickAngleTo": "Nothing",
+              "allowDiagonals": true
+            }
+          ],
+          "animations": [
+            {
+              "name": "idle_right",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "images/mario_idle_right.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 24,
+                        "y": 24
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "walk_right",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "images/mario_walk1_right.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 24,
+                        "y": 24
+                      },
+                      "customCollisionMask": []
+                    },
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "images/mario_walk2_right.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 24,
+                        "y": 24
+                      },
+                      "customCollisionMask": []
+                    },
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "images/mario_walk3_right.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 24,
+                        "y": 24
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "InteractiveObject",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "ObjectID",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "NameEnglish",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "NameFinnish",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "NameTagalog",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "DescriptionEnglish",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "DescriptionFinnish",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "DescriptionTagalog",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "ExampleEnglish",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "ExampleFinnish",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "ExampleTagalog",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "HasDetailView",
+              "type": "boolean",
+              "value": false
+            }
+          ],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "refrigerator",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "images/refrigerator.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "bed",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "images/bed.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "NPC",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "NPCID",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "ComplaintEnglish",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "ComplaintFinnish",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "ComplaintTagalog",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "PatientNameEnglish",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "PatientNameFinnish",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "PatientNameTagalog",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "MoveTimer",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "IsMoving",
+              "type": "boolean",
+              "value": false
+            }
+          ],
+          "behaviors": [
+            {
+              "name": "PathfindingObstacle",
+              "type": "PathfindingObstacleBehavior::PathfindingObstacleBehavior",
+              "impassable": true,
+              "cost": 2
+            }
+          ],
+          "animations": [
+            {
+              "name": "patient1",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "npc_patient1.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 24,
+                        "y": 24
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "patient2",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "npc_patient2.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 24,
+                        "y": 24
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "PLAYER MOVEMENT\nUse WASD or Arrow Keys to move the player character"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": []
+        }
+      ],
+      "layers": [
+        {
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        },
+        {
+          "name": "UI",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    },
+    {
+      "b": 32,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "PatientRoom",
+      "name": "PatientRoom",
+      "r": 32,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "Patient Room",
+      "v": 32,
+      "uiSettings": {
+        "grid": true,
+        "gridType": "rectangular",
+        "gridWidth": 20,
+        "gridHeight": 20,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridColor": "10401023",
+        "gridAlpha": 0.8,
+        "snap": true,
+        "zoomFactor": 1,
+        "windowMask": false
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [],
+      "objects": [],
+      "events": [],
+      "layers": [
+        {
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    },
+    {
+      "b": 245,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "BedComponents",
+      "name": "BedComponents",
+      "r": 245,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "Bed Components",
+      "v": 245,
+      "uiSettings": {
+        "grid": true,
+        "gridType": "rectangular",
+        "gridWidth": 20,
+        "gridHeight": 20,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridColor": "10401023",
+        "gridAlpha": 0.8,
+        "snap": true,
+        "zoomFactor": 1,
+        "windowMask": false
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [],
+      "objects": [],
+      "events": [],
+      "layers": [
+        {
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    }
+  ],
+  "externalEvents": [],
+  "eventsFunctionsExtensions": [],
+  "externalLayouts": [],
+  "externalSourceFiles": []
+}

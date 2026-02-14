@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Canvas Test - Does This Work?</title>
+<style>
+body {
+  margin: 0;
+  padding: 20px;
+  background: #1a1a1a;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+canvas {
+  border: 2px solid #00ff00;
+  display: block;
+  margin: 20px 0;
+}
+button {
+  padding: 15px 30px;
+  font-size: 18px;
+  background: #00ff00;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+button:hover {
+  background: #00cc00;
+}
+#status {
+  margin: 20px 0;
+  padding: 15px;
+  background: #333;
+  border-radius: 5px;
+}
+</style>
+</head>
+<body>
+
+<h1>🧪 Canvas Test - If this works, your browser is OK!</h1>
+
+<div id="status">Status: Waiting for test...</div>
+
+<button onclick="runTest()">Click to Test Canvas</button>
+
+<canvas id="testCanvas" width="640" height="480"></canvas>
+
+<script>
+function runTest() {
+  const status = document.getElementById('status');
+  const canvas = document.getElementById('testCanvas');
+  
+  status.innerHTML = '<strong>Testing...</strong>';
+  
+  // Test 1: Canvas element exists
+  if (!canvas) {
+    status.innerHTML = '❌ FAIL: Canvas element not found!';
+    status.style.background = '#ff0000';
+    return;
+  }
+  status.innerHTML += '<br>✅ Canvas element found';
+  
+  // Test 2: Can get context
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    status.innerHTML += '<br>❌ FAIL: Cannot get canvas context!';
+    status.style.background = '#ff0000';
+    return;
+  }
+  status.innerHTML += '<br>✅ Canvas context obtained';
+  
+  // Test 3: Can draw
+  try {
+    // Clear canvas
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, 640, 480);
+    status.innerHTML += '<br>✅ Canvas cleared (black)';
+    
+    // Draw colored background
+    ctx.fillStyle = '#1a3a5a';
+    ctx.fillRect(0, 0, 640, 480);
+    status.innerHTML += '<br>✅ Background drawn (blue)';
+    
+    // Draw a rectangle
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(100, 100, 100, 100);
+    status.innerHTML += '<br>✅ Red rectangle drawn';
+    
+    // Draw text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 24px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Canvas Works!', 320, 240);
+    status.innerHTML += '<br>✅ Text drawn';
+    
+    // Draw circle
+    ctx.fillStyle = '#00ff00';
+    ctx.beginPath();
+    ctx.arc(400, 300, 50, 0, Math.PI * 2);
+    ctx.fill();
+    status.innerHTML += '<br>✅ Green circle drawn';
+    
+    // Animation test
+    let x = 0;
+    function animate() {
+      // Move rectangle
+      ctx.fillStyle = '#1a3a5a';
+      ctx.fillRect(0, 0, 640, 480);
+      
+      ctx.fillStyle = '#ff00ff';
+      ctx.fillRect(x, 350, 50, 50);
+      
+      x = (x + 2) % 640;
+      requestAnimationFrame(animate);
+    }
+    animate();
+    status.innerHTML += '<br>✅ Animation started (see moving pink square)';
+    
+    status.innerHTML += '<br><br><strong style="color: #00ff00; font-size: 20px;">✅ ALL TESTS PASSED! Your browser works perfectly!</strong>';
+    status.style.background = '#004400';
+    
+  } catch (error) {
+    status.innerHTML += '<br>❌ FAIL: Error drawing - ' + error.message;
+    status.style.background = '#ff0000';
+    console.error('Draw error:', error);
+  }
+}
+
+// Auto-run test on load
+window.onload = function() {
+  console.log('Test page loaded');
+  document.getElementById('status').innerHTML = 'Page loaded. Click the button to test!';
+};
+</script>
+
+</body>
+</html>
