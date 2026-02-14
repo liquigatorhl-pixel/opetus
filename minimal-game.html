@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minimal Working Game - No Images</title>
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  background: #0a0a0f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+#gameCanvas {
+  border: 2px solid #3498db;
+  max-width: 100%;
+  height: auto;
+}
+
+#info {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: white;
+  background: rgba(0,0,0,0.7);
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+</style>
+</head>
+<body>
+
+<div id="info">
+  <strong>Minimal Game Test</strong><br>
+  Use Arrow Keys to Move<br>
+  <span id="status">Initializing...</span>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<script>
+// Simple game with NO image dependencies
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const status = document.getElementById('status');
+
+// Game constants
+const GRID_SIZE = 20;
+const COLS = 32;
+const ROWS = 24;
+
+canvas.width = COLS * GRID_SIZE;
+canvas.height = ROWS * GRID_SIZE;
+
+// Player
+const player = {
+  x: 16,
+  y: 12,
+  color: '#e74c3c'
+};
+
+// Objects (colored rectangles)
+const objects = [
+  { x: 5, y: 5, w: 3, h: 2, color: '#3498db', name: 'Bed' },
+  { x: 10, y: 5, w: 2, h: 2, color: '#e67e22', name: 'Stove' },
+  { x: 15, y: 5, w: 2, h: 3, color: '#9b59b6', name: 'Fridge' },
+  { x: 20, y: 5, w: 2, h: 2, color: '#2ecc71', name: 'Table' }
+];
+
+// Input
+const keys = {};
+
+document.addEventListener('keydown', e => {
+  keys[e.key] = true;
+});
+
+document.addEventListener('keyup', e => {
+  keys[e.key] = false;
+});
+
+// Touch controls for mobile
+let touchStartX = 0;
+let touchStartY = 0;
+
+canvas.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+});
+
+canvas.addEventListener('touchend', e => {
+  const touchEndX = e.changedTouches[0].clientX;
+  const touchEndY = e.changedTouches[0].clientY;
+  
+  const dx = touchEndX - touchStartX;
+  const dy = touchEndY - touchStartY;
+  
+  if (Math.abs(dx) > Math.abs(dy)) {
+    if (dx > 30) player.x = Math.min(player.x + 1, COLS - 1);
+    if (dx < -30) player.x = Math.max(player.x - 1, 0);
+  } else {
+    if (dy > 30) player.y = Math.min(player.y + 1, ROWS - 1);
+    if (dy < -30) player.y = Math.max(player.y - 1, 0);
+  }
+});
+
+// Game loop
+function update() {
+  // Move player
+  if (keys['ArrowLeft']) player.x = Math.max(player.x - 0.2, 0);
+  if (keys['ArrowRight']) player.x = Math.min(player.x + 0.2, COLS - 1);
+  if (keys['ArrowUp']) player.y = Math.max(player.y - 0.2, 0);
+  if (keys['ArrowDown']) player.y = Math.min(player.y + 0.2, ROWS - 1);
+}
+
+function draw() {
+  // Clear canvas with background color
+  ctx.fillStyle = '#42372f';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Draw grid
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < COLS; x++) {
+    ctx.beginPath();
+    ctx.moveTo(x * GRID_SIZE, 0);
+    ctx.lineTo(x * GRID_SIZE, canvas.height);
+    ctx.stroke();
+  }
+  for (let y = 0; y < ROWS; y++) {
+    ctx.beginPath();
+    ctx.moveTo(0, y * GRID_SIZE);
+    ctx.lineTo(canvas.width, y * GRID_SIZE);
+    ctx.stroke();
+  }
+  
+  // Draw objects
+  objects.forEach(obj => {
+    ctx.fillStyle = obj.color;
+    ctx.fillRect(
+      obj.x * GRID_SIZE,
+      obj.y * GRID_SIZE,
+      obj.w * GRID_SIZE,
+      obj.h * GRID_SIZE
+    );
+    
+    // Draw border
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(
+      obj.x * GRID_SIZE,
+      obj.y * GRID_SIZE,
+      obj.w * GRID_SIZE,
+      obj.h * GRID_SIZE
+    );
+    
+    // Draw name
+    ctx.fillStyle = 'white';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(
+      obj.name,
+      (obj.x + obj.w / 2) * GRID_SIZE,
+      (obj.y + obj.h / 2) * GRID_SIZE
+    );
+  });
+  
+  // Draw player
+  ctx.fillStyle = player.color;
+  ctx.beginPath();
+  ctx.arc(
+    (player.x + 0.5) * GRID_SIZE,
+    (player.y + 0.5) * GRID_SIZE,
+    GRID_SIZE / 2,
+    0,
+    Math.PI * 2
+  );
+  ctx.fill();
+  
+  // Draw player border
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // Update status
+  status.textContent = `✅ Game Running! Player: (${Math.floor(player.x)}, ${Math.floor(player.y)})`;
+}
+
+// Main game loop
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+// Start the game
+console.log('🎮 Starting minimal game...');
+console.log('Canvas size:', canvas.width, 'x', canvas.height);
+console.log('If you can see colored rectangles, canvas is working!');
+
+status.textContent = '✅ Game Loaded!';
+gameLoop();
+</script>
+
+</body>
+</html>
