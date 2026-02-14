@@ -1,0 +1,2934 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#16213e">
+<link rel="manifest" href="manifest.json">
+<title>Medical Language Learning Game</title>
+<style>
+/* ============================================
+   GLOBAL RESET AND BASE STYLES
+   ============================================ */
+* { 
+  margin: 0; 
+  padding: 0; 
+  box-sizing: border-box; 
+}
+
+/* ============================================
+   BODY AND BACKGROUND
+   ============================================ */
+body { 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-image: url('background.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-color: #0a0a0f;
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  min-height: 100vh; 
+  padding: 20px; 
+}
+
+#root { 
+  width: 100%; 
+  max-width: 900px;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.6));
+}
+
+.container { 
+  background: rgba(22, 33, 62, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px; 
+  overflow: hidden; 
+  position: relative; 
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================
+   HEADER SECTION
+   ============================================ */
+.header { 
+  background: linear-gradient(135deg, rgba(15, 52, 96, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%); 
+  color: #ffffff; 
+  padding: 30px; 
+  text-align: center; 
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header h1 { 
+  font-size: 32px; 
+  margin-bottom: 12px; 
+  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.header p { 
+  color: rgba(255, 255, 255, 0.7); 
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.rooms { 
+  display: flex; 
+  gap: 15px; 
+  justify-content: center; 
+  margin-top: 20px; 
+}
+
+.room-btn { 
+  background: rgba(255, 255, 255, 0.05); 
+  border: 1px solid rgba(255, 255, 255, 0.2); 
+  color: rgba(255, 255, 255, 0.8); 
+  padding: 12px 28px; 
+  border-radius: 12px; 
+  cursor: pointer; 
+  font-size: 16px; 
+  font-weight: 500; 
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.room-btn:hover { 
+  background: rgba(255, 255, 255, 0.1); 
+  color: #ffffff; 
+  transform: translateY(-2px); 
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.room-btn.active { 
+  background: rgba(255, 255, 255, 0.15); 
+  color: #ffffff; 
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+}
+
+.content { 
+  padding: 30px; 
+  min-height: 500px; 
+  position: relative; 
+}
+
+.canvas-box { 
+  width: 100%; 
+  background: #0a0a0f; 
+  border-radius: 12px; 
+  overflow: hidden; 
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5); 
+  position: relative; 
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+canvas { 
+  display: block; 
+  width: 100%; 
+  height: auto; 
+  image-rendering: pixelated; 
+  image-rendering: crisp-edges; 
+  cursor: pointer; 
+}
+
+/* ============================================
+   MINIMALISTIC POPUP
+   ============================================ */
+.game-popup-overlay { 
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%; 
+  background: rgba(0, 0, 0, 0.75); 
+  backdrop-filter: blur(8px);
+  display: none; 
+  justify-content: center; 
+  align-items: center; 
+  z-index: 100; 
+  pointer-events: all; 
+}
+
+.game-popup-overlay.show { 
+  display: flex; 
+}
+
+.game-popup { 
+  background: rgba(255, 255, 255, 0.98); 
+  border-radius: 16px; 
+  padding: 24px; 
+  max-width: 700px; 
+  width: 90%; 
+  max-height: 85%; 
+  overflow-y: auto; 
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); 
+  border: none;
+  position: relative;
+}
+
+.game-popup::-webkit-scrollbar {
+  width: 6px;
+}
+
+.game-popup::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.game-popup::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.game-popup h2 { 
+  color: #1a1a1a; 
+  margin-bottom: 16px; 
+  font-size: 18px; 
+  text-align: left; 
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.game-popup .lang { 
+  padding: 0 0 16px 0; 
+  margin-bottom: 16px; 
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.game-popup .lang:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Side-by-side language layout */
+.lang-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.game-popup .lang h3 { 
+  color: rgba(0, 0, 0, 0.45); 
+  font-size: 10px; 
+  text-transform: uppercase; 
+  margin-bottom: 6px; 
+  letter-spacing: 0.8px;
+  font-weight: 600;
+}
+
+.game-popup .name { 
+  font-size: 20px; 
+  font-weight: 600; 
+  color: #1a1a1a; 
+  margin-bottom: 8px; 
+  line-height: 1.2;
+}
+
+.game-popup .desc { 
+  color: rgba(0, 0, 0, 0.7); 
+  margin-bottom: 8px; 
+  line-height: 1.5; 
+  font-size: 13px; 
+}
+
+.game-popup .ex { 
+  color: rgba(0, 0, 0, 0.6); 
+  font-style: italic; 
+  font-size: 12px; 
+  padding: 0;
+  margin: 8px 0;
+}
+
+.game-popup .tts { 
+  background: #1a1a1a; 
+  color: white; 
+  border: none; 
+  padding: 8px 16px; 
+  border-radius: 6px; 
+  cursor: pointer; 
+  font-size: 12px; 
+  font-weight: 500; 
+  width: 100%; 
+  margin-top: 10px; 
+  transition: all 0.2s ease;
+}
+
+.game-popup .tts:hover { 
+  background: #2a2a2a;
+  transform: translateY(-1px);
+}
+
+.game-popup .tts.playing { 
+  background: #0066ff; 
+}
+
+/* NPC-specific popup styling */
+.game-popup .symptom {
+  background: rgba(231, 76, 60, 0.08);
+  border-left: 3px solid #e74c3c;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 6px;
+}
+
+.game-popup .symptom-title {
+  font-weight: 600;
+  color: #e74c3c;
+  margin-bottom: 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.game-popup .symptom-text {
+  color: rgba(0, 0, 0, 0.8);
+  line-height: 1.5;
+  font-size: 13px;
+}
+
+.close-popup { 
+  position: absolute; 
+  top: 16px; 
+  right: 16px; 
+  width: 28px; 
+  height: 28px; 
+  border-radius: 50%; 
+  background: rgba(0, 0, 0, 0.06); 
+  color: rgba(0, 0, 0, 0.6); 
+  border: none; 
+  font-size: 18px; 
+  cursor: pointer; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  transition: all 0.2s ease;
+  font-weight: 400;
+}
+
+.close-popup:hover { 
+  background: rgba(0, 0, 0, 0.1); 
+  color: rgba(0, 0, 0, 0.8);
+}
+
+/* ============================================
+   SHOWCASE POPUP (for component displays)
+   ============================================ */
+.showcase-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+  pointer-events: all;
+}
+
+.showcase-overlay.show {
+  display: flex;
+}
+
+.showcase-popup {
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 90%;
+  width: 900px;
+  max-height: 90%;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: none;
+  position: relative;
+}
+
+.showcase-popup::-webkit-scrollbar {
+  width: 8px;
+}
+
+.showcase-popup::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.showcase-popup::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.showcase-popup h2 {
+  color: #1a1a1a;
+  margin-bottom: 24px;
+  font-size: 24px;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.showcase-item {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.showcase-item:hover {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.showcase-item-image-wrapper {
+  width: 100%;
+  height: 160px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.showcase-item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 8px;
+}
+
+.showcase-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: inherit;
+}
+
+.showcase-item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-align: center;
+  line-height: 1.3;
+  min-height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-showcase {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.08);
+  color: rgba(0, 0, 0, 0.7);
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-weight: 400;
+  z-index: 10;
+}
+
+.close-showcase:hover {
+  background: rgba(0, 0, 0, 0.15);
+  color: rgba(0, 0, 0, 0.9);
+}
+
+/* ============================================
+   MODAL OVERLAY
+   ============================================ */
+.modal-overlay { 
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%; 
+  background: rgba(0, 0, 0, 0.85); 
+  backdrop-filter: blur(10px);
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  z-index: 1000; 
+}
+
+.modal { 
+  background: rgba(22, 33, 62, 0.98); 
+  border-radius: 20px; 
+  padding: 40px; 
+  max-width: 500px; 
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9); 
+  text-align: center; 
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal h2 { 
+  color: #ffffff; 
+  font-size: 36px; 
+  margin-bottom: 20px; 
+  font-weight: 600;
+}
+
+.modal p { 
+  color: rgba(255, 255, 255, 0.8); 
+  font-size: 16px; 
+  line-height: 1.8; 
+  margin-bottom: 15px; 
+}
+
+.modal-btn { 
+  background: rgba(255, 255, 255, 0.15); 
+  color: white; 
+  border: 1px solid rgba(255, 255, 255, 0.3); 
+  padding: 15px 40px; 
+  border-radius: 12px; 
+  cursor: pointer; 
+  font-size: 18px; 
+  font-weight: 600; 
+  margin-top: 20px; 
+  transition: all 0.3s ease;
+}
+
+.modal-btn:hover { 
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px); 
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+}
+
+.lang-select { 
+  margin-top: 25px; 
+}
+
+.lang-select h3 { 
+  color: #ffffff; 
+  font-size: 18px; 
+  margin-bottom: 15px; 
+  font-weight: 600;
+}
+
+.lang-options { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 12px; 
+  margin-bottom: 20px; 
+}
+
+.lang-option { 
+  display: flex; 
+  align-items: center; 
+  padding: 15px 20px; 
+  background: rgba(255, 255, 255, 0.05); 
+  border-radius: 12px; 
+  cursor: pointer; 
+  transition: all 0.3s ease; 
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lang-option:hover { 
+  background: rgba(255, 255, 255, 0.1); 
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.lang-option.selected { 
+  background: rgba(255, 255, 255, 0.15); 
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+}
+
+.lang-option input[type="checkbox"] { 
+  width: 20px; 
+  height: 20px; 
+  margin-right: 12px; 
+  cursor: pointer; 
+  accent-color: rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+}
+
+.lang-option label { 
+  flex: 1; 
+  cursor: pointer; 
+  font-size: 16px; 
+  color: rgba(255, 255, 255, 0.9); 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  font-weight: 500;
+}
+
+.lang-option .flag { 
+  font-size: 24px; 
+}
+
+.error-msg { 
+  color: #ff6b6b; 
+  font-size: 14px; 
+  margin-top: 10px; 
+  display: none; 
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .header h1 { font-size: 24px; }
+  .header p { font-size: 13px; }
+  .rooms { flex-direction: column; gap: 10px; }
+  .room-btn { width: 100%; }
+  .content { padding: 20px; }
+  .game-popup { width: 95%; padding: 24px; }
+  .modal { padding: 30px 20px; }
+}
+</style>
+</head>
+<body>
+<div id="root">
+<div class="container">
+
+<div id="langModal" class="modal-overlay">
+<div class="modal">
+<h2>🏥 Welcome!</h2>
+<p>Choose <strong>2 languages</strong> to learn medical vocabulary</p>
+<div class="lang-select">
+<div class="lang-options">
+<div class="lang-option" onclick="toggleLang('english', this)">
+<input type="checkbox" id="lang-english">
+<label><span class="flag">🇬🇧</span> English</label>
+</div>
+<div class="lang-option" onclick="toggleLang('finnish', this)">
+<input type="checkbox" id="lang-finnish">
+<label><span class="flag">🇫🇮</span> Finnish (Suomi)</label>
+</div>
+<div class="lang-option" onclick="toggleLang('tagalog', this)">
+<input type="checkbox" id="lang-tagalog">
+<label><span class="flag">🇵🇭</span> Tagalog</label>
+</div>
+</div>
+<p class="error-msg" id="langError">Please select exactly 2 languages!</p>
+</div>
+<button class="modal-btn" onclick="startGame()">Start Learning!</button>
+<p style="margin-top:20px; font-size:14px; color:rgba(255,255,255,0.6);">Use <strong>Arrow Keys</strong> or <strong>WASD</strong> to move</p>
+</div>
+</div>
+
+<div id="instructModal" class="modal-overlay" style="display:none;">
+<div class="modal">
+<h2>🎮 How to Play</h2>
+<p><strong>Movement Controls:</strong></p>
+<p>⬆️ <strong>W</strong> or <strong>↑</strong> = Move Up</p>
+<p>⬇️ <strong>S</strong> or <strong>↓</strong> = Move Down</p>
+<p>⬅️ <strong>A</strong> or <strong>←</strong> = Move Left</p>
+<p>➡️ <strong>D</strong> or <strong>→</strong> = Move Right</p>
+<p style="margin-top:20px;"><strong>Click on objects</strong> to learn their names!</p>
+<p style="margin-top:15px;"><strong>Click on patients</strong> to hear their symptoms!</p>
+<p>🖱️ Hover over items to highlight them</p>
+<p>🔊 Click audio buttons to hear pronunciations</p>
+<button class="modal-btn" onclick="closeInstructions()">Let's Go!</button>
+</div>
+</div>
+
+<div class="header">
+<h1>🏥 Medical Facility Language Learning</h1>
+<p>Use WASD or Arrow Keys to move - Click objects and patients to learn! <span style="background: rgba(46, 204, 113, 0.2); color: #2ecc71; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-left: 8px;">✨ AI-Enhanced</span></p>
+<div class="rooms">
+<button id="kitchenBtn" class="room-btn active" onclick="changeRoom('kitchen')">🍽️ Kitchen</button>
+<button id="patientBtn" class="room-btn" onclick="changeRoom('patient')">🛏️ Patient Room</button>
+</div>
+</div>
+
+<div class="content">
+<div class="canvas-box">
+<canvas id="gameCanvas"></canvas>
+
+<div class="game-popup-overlay" id="popupOverlay" onclick="closePopup(event)">
+<div class="game-popup" onclick="event.stopPropagation()">
+<button class="close-popup" onclick="closePopup()">×</button>
+<div id="popupContent"></div>
+</div>
+</div>
+
+<div class="showcase-overlay" id="showcaseOverlay" onclick="closeShowcase(event)">
+<div class="showcase-popup" onclick="event.stopPropagation()">
+<button class="close-showcase" onclick="closeShowcase()">×</button>
+<div id="showcaseContent"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+// ============================================
+// GAME CONFIGURATION
+// ============================================
+const GRID_SIZE = 20;
+const COLS = 32;
+const ROWS = 24;
+const W = 48, H = 48; // Character size - BIGGER NOW (was 32x32)
+const MOVE_SPEED = 0.5; // SLOWER: Reduced from 2 to 0.5 for smoother, slower movement
+
+// ⚙️ ADJUSTABLE NPC SIZE - Change these values to resize NPCs
+const NPC_WIDTH = 96;  // NPC width in pixels (doubled from 48)
+const NPC_HEIGHT = 96; // NPC height in pixels (doubled from 48)
+
+const HITBOX_PADDING = 2;  // Further reduced from 5 to 2 - very small hitboxes for easy navigation
+const CLICK_PADDING = 9.5;  // Reduced by 5% (from 10) for more precise clicking
+
+// ============================================
+// GAME STATE
+// ============================================
+let room = 'kitchen';
+let sel = null;
+let char = { gridX: 16, gridY: 20, dir: 'right', frame: 0, animFrame: 0 };
+let can, ctx;
+let keyPressed = false;
+let selectedLangs = [];
+let currentAudio = null;
+let playingLang = null;
+let hoveredObject = null;
+let hoveredNPC = null;
+let mouseX = 0, mouseY = 0;
+let images = {};
+let imagesLoaded = 0;
+
+// NPC state
+let npcs = [];
+
+// ============================================
+// LANGUAGE CONFIGURATION
+// ============================================
+const langInfo = {
+  english: { flag: '🇬🇧', name: 'English', code: 'en-US', voiceName: 'Google US English' },
+  finnish: { flag: '🇫🇮', name: 'Finnish', code: 'fi-FI', voiceName: 'Google suomi' },
+  tagalog: { flag: '🇵🇭', name: 'Tagalog', code: 'fil-PH', voiceName: 'Google Filipino' }
+};
+
+// ============================================
+// NPC COMPLAINTS DATA
+// ============================================
+const npcComplaints = [
+  {
+    english: { name: "Dizzy Patient", complaint: "I feel so dizzy and lightheaded. The room is spinning and I can't stand up without feeling like I might fall." },
+    finnish: { name: "Huimaava potilas", complaint: "Minulla on niin huimaa ja kevyttä päässä. Huone pyörii enkä voi nousta seisomaan tuntematta, että saatan kaatua." },
+    tagalog: { name: "Nahihilo na Pasyente", complaint: "Nahihilo ako at parang lulutang. Umiikot ang silid at hindi ako makatayo nang hindi pakiramdam na baka mahulog." }
+  },
+  {
+    english: { name: "Nauseous Patient", complaint: "I feel very nauseous and my stomach is upset. I've been feeling sick all morning and can't eat anything." },
+    finnish: { name: "Pahoinvoiva potilas", complaint: "Minua oksettaa kovasti ja vatsa on kipeä. Olen tuntenut oloni sairaaksi koko aamun enkä voi syödä mitään." },
+    tagalog: { name: "Nasusukaang Pasyente", complaint: "Nasusuka ako at masakit ang tiyan ko. Masama ang pakiramdam ko buong umaga at hindi ako makakain ng anuman." }
+  },
+  {
+    english: { name: "Headache Patient", complaint: "I have a terrible headache that won't go away. It's throbbing and the light makes it worse." },
+    finnish: { name: "Päänsärkypotilas", complaint: "Minulla on hirveä päänsärky, joka ei häviä. Se jomottaa ja valo tekee siitä pahemman." },
+    tagalog: { name: "May Sakit ng Ulo", complaint: "Masakit na masakit ang ulo ko at hindi nawawala. Tumitibok ito at lalong lumala sa liwanag." }
+  },
+  {
+    english: { name: "Fever Patient", complaint: "I'm burning up with fever and feel so weak. I'm sweating a lot and everything aches." },
+    finnish: { name: "Kuumepotilas", complaint: "Minulla on kova kuume ja tunnen itseni niin heikoksi. Hikoilen paljon ja kaikki särkee." },
+    tagalog: { name: "May Lagnat", complaint: "Mainit ako sa lagnat at napakahina ko. Marami akong pawis at masakit ang lahat." }
+  },
+  {
+    english: { name: "Coughing Patient", complaint: "I can't stop coughing and my chest hurts. The cough keeps me awake at night." },
+    finnish: { name: "Yskivä potilas", complaint: "En voi lopettaa yskimistä ja rintani särkee. Yskä pitää minut hereillä yöllä." },
+    tagalog: { name: "Umuubo na Pasyente", complaint: "Hindi ako makatigil sa pag-ubo at masakit ang dibdib ko. Ang ubo ay nagpapagising sa akin sa gabi." }
+  },
+  {
+    english: { name: "Tired Patient", complaint: "I'm exhausted and can barely keep my eyes open. I feel drained of all energy." },
+    finnish: { name: "Väsynyt potilas", complaint: "Olen uupunut enkä tuskin pysy hereillä. Tunnen olevani täysin energiatön." },
+    tagalog: { name: "Pagod na Pasyente", complaint: "Sobrang pagod ako at halos hindi ko mabuksan ang mata. Pakiramdam ko wala na akong lakas." }
+  },
+  {
+    english: { name: "Anxious Patient", complaint: "My heart is racing and I feel very anxious. I can't calm down and my hands are shaking." },
+    finnish: { name: "Ahdistunut potilas", complaint: "Sydämeni hakkaa ja tunnen oloni hyvin ahdistuneeksi. En voi rauhoittua ja käteni vapisevat." },
+    tagalog: { name: "Nag-aalala na Pasyente", complaint: "Mabilis ang tibok ng puso ko at kinakabahan ako. Hindi ako makakalma at nanginginig ang mga kamay ko." }
+  },
+  {
+    english: { name: "Sore Throat Patient", complaint: "My throat is so sore I can barely swallow. It hurts to talk and even drink water." },
+    finnish: { name: "Kurkkukipupotilas", complaint: "Kurkkuni on niin kipeä, että voin tuskin niellä. Sattuu puhua ja jopa juoda vettä." },
+    tagalog: { name: "May Sakit ng Lalamunan", complaint: "Masakit ang lalamunan ko at hirap akong lumunok. Masakit magsalita at kahit uminom ng tubig." }
+  }
+];
+
+// ============================================
+// IMAGE ASSETS
+// ============================================
+const imageUrls = {
+  // Room backgrounds
+  room_kitchen: 'room_kitchen.png',
+  room_patient: 'room_patient.png',
+  
+  // Kitchen objects
+  refrigerator: 'images/refrigerator.png',
+  sink: 'images/sink.png',
+  stove: 'images/stove.png',
+  microwave: 'images/microwave.png',
+  cabinet: 'images/cabinet.png',
+  table: 'images/table.png',
+  chair: 'images/chair.png',
+  trash: 'images/trash.png',
+  counter: 'images/counter.png',
+  dishwasher: 'images/dishwasher.png',
+  pantry: 'images/pantry.png',
+  
+  // Patient room objects
+  bed: 'images/bed.png',
+  monitor: 'images/monitor.png',
+  iv_stand: 'images/iv_stand.png',
+  bedside_table: 'images/bedside_table.png',
+  chair_patient: 'images/chair_patient.png',
+  call_button: 'images/call_button.png',
+  oxygen: 'images/oxygen.png',
+  trash_medical: 'images/trash_medical.png',
+  sink_medical: 'images/sink_medical.png',
+  med_cabinet: 'images/med_cabinet.png',
+  overbed_table: 'images/overbed_table.png',
+  blood_pressure: 'images/blood_pressure.png',
+  
+  // Character sprites (now 48x48)
+  mario_idle_right: 'images/mario_idle_right.png',
+  mario_walk1_right: 'images/mario_walk1_right.png',
+  mario_walk2_right: 'images/mario_walk2_right.png',
+  mario_walk3_right: 'images/mario_walk3_right.png',
+  mario_idle_left: 'images/mario_idle_left.png',
+  mario_walk1_left: 'images/mario_walk1_left.png',
+  mario_walk2_left: 'images/mario_walk2_left.png',
+  mario_walk3_left: 'images/mario_walk3_left.png',
+  mario_idle_up: 'images/mario_idle_up.png',
+  mario_walk1_up: 'images/mario_walk1_up.png',
+  mario_walk2_up: 'images/mario_walk2_up.png',
+  mario_walk3_up: 'images/mario_walk3_up.png',
+  mario_idle_down: 'images/mario_idle_down.png',
+  mario_walk1_down: 'images/mario_walk1_down.png',
+  mario_walk2_down: 'images/mario_walk2_down.png',
+  mario_walk3_down: 'images/mario_walk3_down.png',
+  
+  // NPC sprites (48x48)
+  npc_patient1: 'npc_patient1.png',
+  npc_patient2: 'npc_patient2.png',
+  npc_patient3: 'npc_patient3.png',
+  npc_patient4: 'npc_patient4.png',
+  
+  // Bed components
+  mattress: 'images/mattress.png',
+  bedsheet: 'images/bedsheet.png',
+  pillow: 'images/pillow.png',
+  pillowcase: 'images/pillowcase.png',
+  blanket: 'images/blanket.png',
+  fitted_sheet: 'images/fitted_sheet.png',
+  bed_pad: 'images/bed_pad.png',
+  bed_rail: 'images/bed_rail.png',
+  headboard: 'images/headboard.png',
+  footboard: 'images/footboard.png',
+  
+  // Stove components
+  burner: 'images/burner.png',
+  oven: 'images/oven.png',
+  oven_rack: 'images/oven_rack.png',
+  control_knobs: 'images/control_knobs.png',
+  drip_pan: 'images/drip_pan.png',
+  broiler: 'images/broiler.png',
+  timer: 'images/timer.png',
+  vent_hood: 'images/vent_hood.png',
+  
+  // Refrigerator components
+  fridge_shelf: 'images/fridge_shelf.png',
+  crisper_drawer: 'images/crisper_drawer.png',
+  door_shelf: 'images/door_shelf.png',
+  freezer_compartment: 'images/freezer_compartment.png',
+  ice_maker: 'images/ice_maker.png',
+  temperature_control: 'images/temperature_control.png',
+  fridge_light: 'images/fridge_light.png',
+  butter_compartment: 'images/butter_compartment.png',
+  
+  // Medical cabinet components
+  syringe: 'images/syringe.png',
+  bandages: 'images/bandages.png',
+  gauze: 'images/gauze.png',
+  antiseptic: 'images/antiseptic.png',
+  thermometer: 'images/thermometer.png',
+  medical_gloves: 'images/medical_gloves.png',
+  medical_scissors: 'images/medical_scissors.png',
+  medical_tape: 'images/medical_tape.png',
+  cotton_balls: 'images/cotton_balls.png',
+  alcohol_wipes: 'images/alcohol_wipes.png',
+  
+  // Pantry groceries
+  rice: 'images/rice.png',
+  pasta: 'images/pasta.png',
+  canned_beans: 'images/canned_beans.png',
+  canned_soup: 'images/canned_soup.png',
+  bread: 'images/bread.png',
+  cereal: 'images/cereal.png',
+  flour: 'images/flour.png',
+  sugar: 'images/sugar.png',
+  cooking_oil: 'images/cooking_oil.png',
+  salt: 'images/salt.png'
+};
+
+// ============================================
+// GAME OBJECTS - LOGICAL PLACEMENT
+// Objects placed where you'd actually find them
+// ============================================
+// ⚙️ ADJUSTABLE OBJECT PROPERTIES:
+// 
+// Each object has these adjustable properties:
+// - gridX: Horizontal position (0-31, left to right)
+// - gridY: Vertical position (0-23, top to bottom)  
+// - gridW: Width in grid cells
+// - gridH: Height in grid cells
+// - zIndex: Layering order (LOWER = further back, HIGHER = further forward)
+//
+// 🎨 Z-INDEX LAYERING GUIDE:
+// - Background image: 0 (automatically furthest back)
+// - Table/floor objects: 5-10
+// - Wall objects/cabinets: 10-20
+// - Tall appliances: 20-25
+// - Small items on top: 25-30
+// - Player/NPCs: Always rendered on top
+//
+// EXAMPLE: To make a chair appear in front of a table:
+// table:  {... zIndex: 5 ...}
+// chair:  {... zIndex: 30 ...}
+//
+// ============================================
+
+const objs = {
+  kitchen: [
+    // BACK WALL (Top) - Upper cabinets and appliances
+    {id:'cabinet',gridX:6,gridY:0,gridW:5,gridH:3,zIndex:10,img:'cabinet',english:{name:'Cabinet',description:'A cupboard with shelves used for storing dishes, food, or kitchen supplies.',example:'Store the clean plates in the upper cabinet.'},finnish:{name:'Kaappi',description:'Hyllyillä varustettu kaappi astioiden, ruoan tai keittiötarvikkeiden säilyttämiseen.',example:'Säilytä puhtaat lautaset yläkaapissa.'},tagalog:{name:'Aparador',description:'Isang aparador na may mga estante na ginagamit sa pag-iimbak ng pinggan, pagkain, o kagamitan sa kusina.',example:'Iimbak ang mga malinis na plato sa itaas na aparador.'}},
+    {id:'microwave',gridX:12,gridY:0,gridW:4,gridH:3,zIndex:10,img:'microwave',english:{name:'Microwave',description:'An electric oven that heats food quickly using electromagnetic waves.',example:'You can reheat the patient\'s meal in the microwave for 2 minutes.'},finnish:{name:'Mikroaaltouuni',description:'Sähköuuni, joka lämmittää ruoan nopeasti sähkömagneettisten aaltojen avulla.',example:'Voit lämmittää potilaan aterian mikroaaltouunissa 2 minuuttia.'},tagalog:{name:'Microwave',description:'Isang electric oven na nagpapainit ng pagkain nang mabilis gamit ang electromagnetic waves.',example:'Maaari mong initin ang pagkain ng pasyente sa microwave ng 2 minuto.'}},
+    
+    // LEFT WALL - Refrigerator and Pantry
+        { id: 'refrigerator', gridX: 23, gridY: 9, gridW: 4, gridH: 7, zIndex: 20, img: 'refrigerator', hasDetailView: true, english: { name: 'Refrigerator', description: 'A large appliance used to keep food and drinks cold and fresh.', example: 'Please store the medications in the refrigerator at 4°C.' }, finnish: { name: 'Jääkaappi', description: 'Suuri laite, jota käytetään ruoan ja juomien pitämiseen kylmänä ja tuoreena.', example: 'Säilytä lääkkeet jääkaapissa 4°C lämpötilassa.' }, tagalog: { name: 'Refrigerator', description: 'Isang malaking aparato na ginagamit upang panatilihing malamig at sariwa ang pagkain at inumin.', example: 'Pakilagay ang mga gamot sa refrigerator sa 4°C.' } },
+    {id:'pantry',gridX:0,gridY:11,gridW:4,gridH:6,zIndex:20,img:'pantry',hasDetailView:true,english:{name:'Pantry',description:'A storage area for food, cooking ingredients, and kitchen supplies.',example:'Store dry goods in the pantry to keep them organized.'},finnish:{name:'Ruokakomero',description:'Säilytystila ruoalle, ruoanlaittoaineille ja keittiötarvikkeille.',example:'Säilytä kuivat elintarvikkeet ruokakomeroissa järjestyksessä.'},tagalog:{name:'Pantry',description:'Isang lugar ng imbakan para sa pagkain, sangkap sa pagluluto, at kagamitan sa kusina.',example:'Iimbak ang mga tuyong produkto sa pantry upang mapanatiling organisado.'}},
+    
+    // RIGHT WALL - Stove and Counter
+    {id:'stove',gridX:19,gridY:10,gridW:5,gridH:5,zIndex:19,img:'stove',hasDetailView:true,english:{name:'Stove',description:'A cooking appliance with burners or heating elements used to cook food.',example:'Heat the soup on the stove until it reaches serving temperature.'},finnish:{name:'Liesi',description:'Keittolaite, jossa on polttimia tai lämmityselementtejä ruoan valmistamiseen.',example:'Lämmitä keitto liedellä, kunnes se saavuttaa tarjoilulämpötilan.'},tagalog:{name:'Kalan',description:'Isang aparato sa pagluluto na may mga burner o heating elements na ginagamit sa pagluluto ng pagkain.',example:'Initin ang sopas sa kalan hanggang umabot sa temperatura ng paghahain.'}},
+    {id:'counter',gridX:14,gridY:8,gridW:4,gridH:4,zIndex:15,img:'counter',english:{name:'Counter',description:'A flat surface used for food preparation and storing kitchen items.',example:'Place the prepared meals on the counter for serving.'},finnish:{name:'Taso',description:'Tasainen pinta ruoan valmistukseen ja keittiötavaroiden säilyttämiseen.',example:'Aseta valmiit ateriat tiskille tarjoilua varten.'},tagalog:{name:'Counter',description:'Isang patag na ibabaw na ginagamit sa paghahanda ng pagkain at pag-iimbak ng kagamitan sa kusina.',example:'Ilagay ang mga inihanda na pagkain sa counter para ihain.'}},
+    
+    // BOTTOM AREA - Sink, Dishwasher (now visible!)
+    {id:'sink',gridX:16,gridY:8,gridW:5,gridH:5,zIndex:18,img:'sink',english:{name:'Sink',description:'A basin with running water used for washing hands, dishes, and food preparation.',example:'Always wash your hands at the sink before handling food.'},finnish:{name:'Pesuallas',description:'Allas juoksevalla vedellä käsien pesemiseen, astioiden ja ruoan valmistukseen.',example:'Pese aina kätesi pesualtaassa ennen ruoan käsittelyä.'},tagalog:{name:'Lababo',description:'Isang palanggana na may tumatakbong tubig na ginagamit sa paghuhugas ng kamay, pinggan, at paghahanda ng pagkain.',example:'Laging hugasan ang iyong mga kamay sa lababo bago humawak ng pagkain.'}},
+    {id:'dishwasher',gridX:12,gridY:18,gridW:5,gridH:5,zIndex:20,img:'dishwasher',english:{name:'Dishwasher',description:'A machine for washing dishes automatically.',example:'Load the dirty dishes into the dishwasher after meals.'},finnish:{name:'Astianpesukone',description:'Kone astioiden automaattiseen pesuun.',example:'Laita likaiset astiat astianpesukoneeseen aterioiden jälkeen.'},tagalog:{name:'Dishwasher',description:'Isang makina para sa awtomatikong paghuhugas ng pinggan.',example:'Ilagay ang mga maruming pinggan sa dishwasher pagkatapos kumain.'}},
+    {id:'trash',gridX:7,gridY:12,gridW:2,gridH:3,zIndex:10,img:'trash',english:{name:'Trash Bin',description:'A container for waste and garbage disposal.',example:'Dispose of food waste in the trash bin immediately.'},finnish:{name:'Roskakori',description:'Säiliö jätteiden ja roskien hävittämiseen.',example:'Hävitä ruokajätteet roskakoriin välittömästi.'},tagalog:{name:'Basurahan',description:'Isang lalagyan para sa basura at pagtatapon ng basura.',example:'Itapon ang mga nabubulok na pagkain sa basurahan kaagad.'}},
+    
+    // CENTER - Dining table and chairs
+    {id:'table',gridX:13,gridY:13,gridW:5,gridH:5,zIndex:11,img:'table',english:{name:'Dining Table',description:'A table where meals are prepared and served.',example:'Please set the patient\'s meal on the dining table.'},finnish:{name:'Ruokapöytä',description:'Pöytä, jossa ateriat valmistetaan ja tarjoillaan.',example:'Aseta potilaan ateria ruokapöydälle.'},tagalog:{name:'Mesa ng Kainan',description:'Isang mesa kung saan inihahanda at inihahain ang mga pagkain.',example:'Pakiayos ang pagkain ng pasyente sa mesa ng kainan.'}},
+    {id:'chair1',gridX:11,gridY:12,gridW:3,gridH:4,zIndex:10,img:'chair',english:{name:'Chair',description:'A seat with a back, typically for one person.',example:'Pull out a chair for the patient to sit comfortably.'},finnish:{name:'Tuoli',description:'Selkänojallinen istuin, tyypillisesti yhdelle henkilölle.',example:'Vedä tuoli potilaalle, jotta hän voi istua mukavasti.'},tagalog:{name:'Upuan',description:'Isang upuan na may sandalan, karaniwang para sa isang tao.',example:'Hilahin ang upuan para sa pasyente upang maupo nang komportable.'}},
+    {id:'chair2',gridX:1,gridY:10,gridW:3,gridH:3,zIndex:10,img:'chair',english:{name:'Chair',description:'A seat with a back, typically for one person.',example:'Pull out a chair for the patient to sit comfortably.'},finnish:{name:'Tuoli',description:'Selkänojallinen istuin, tyypillisesti yhdelle henkilölle.',example:'Vedä tuoli potilaalle, jotta hän voi istua mukavasti.'},tagalog:{name:'Upuan',description:'Isang upuan na may sandalan, karaniwang para sa isang tao.',example:'Hilahin ang upuan para sa pasyente upang maupo nang komportable.'}},
+    {id:'chair3',gridX:1,gridY:6,gridW:3,gridH:3,zIndex:10,img:'chair',english:{name:'Chair',description:'A seat with a back, typically for one person.',example:'Pull out a chair for the patient to sit comfortably.'},finnish:{name:'Tuoli',description:'Selkänojallinen istuin, tyypillisesti yhdelle henkilölle.',example:'Vedä tuoli potilaalle, jotta hän voi istua mukavasti.'},tagalog:{name:'Upuan',description:'Isang upuan na may sandalan, karaniwang para sa isang tao.',example:'Hilahin ang upuan para sa pasyente upang maupo nang komportable.'}},
+    {id:'chair4',gridX:1,gridY:16,gridW:3,gridH:3,zIndex:10,img:'chair',english:{name:'Chair',description:'A seat with a back, typically for one person.',example:'Pull out a chair for the patient to sit comfortably.'},finnish:{name:'Tuoli',description:'Selkänojallinen istuin, tyypillisesti yhdelle henkilölle.',example:'Vedä tuoli potilaalle, jotta hän voi istua mukavasti.'},tagalog:{name:'Upuan',description:'Isang upuan na may sandalan, karaniwang para sa isang tao.',example:'Hilahin ang upuan para sa pasyente upang maupo nang komportable.'}}
+  ],
+  patient: [
+    // Center - Hospital bed (main focus)
+    {id:'bed',gridX:22,gridY:12,gridW:6,gridH:5,zIndex:10,img:'bed',hasDetailView:true,english:{name:'Hospital Bed',description:'An adjustable bed designed for patients to rest and receive medical care.',example:'Please help the patient get into the hospital bed carefully.'},finnish:{name:'Sairaalasänky',description:'Säädettävä sänky, joka on suunniteltu potilaiden lepäämiseen ja hoitoon.',example:'Auta potilasta nousemaan sairaalasänkyyn varovasti.'},tagalog:{name:'Hospital Bed',description:'Isang adjustable bed na dinisenyo para sa mga pasyente upang magpahinga at makatanggap ng medikal na pag-aalaga.',example:'Pakitulungan ang pasyente na makarating sa hospital bed nang maingat.'}},
+    
+    // Next to bed - IV stand and bedside table
+    {id:'iv_stand',gridX:20,gridY:11,gridW:2,gridH:4,zIndex:20,img:'iv_stand',english:{name:'IV Stand',description:'A pole with wheels used to hold intravenous fluid bags for patient treatment.',example:'Hang the IV bag on the IV stand at the correct height.'},finnish:{name:'Tiputusteline',description:'Pyörillä varustettu tanko, johon kiinnitetään suonensisäiset nestepussit potilaan hoitoa varten.',example:'Ripusta tiputuspussi tipustelineeseen oikealle korkeudelle.'},tagalog:{name:'IV Stand',description:'Isang poste na may gulong na ginagamit upang ilagay ang mga intravenous fluid bags para sa paggamot ng pasyente.',example:'Isabit ang IV bag sa IV stand sa tamang taas.'}},
+    {id:'bedside_table',gridX:1,gridY:1,gridW:4,gridH:4,zIndex:15,img:'bedside_table',english:{name:'Bedside Table',description:'A small table next to the bed for patient\'s personal items and necessities.',example:'Place the patient\'s water glass on the bedside table within reach.'},finnish:{name:'Yöpöytä',description:'Pieni pöytä sängyn vieressä potilaan henkilökohtaisille tavaroille ja tarpeille.',example:'Aseta potilaan vesilasi yöpöydälle ulottuville.'},tagalog:{name:'Bedside Table',description:'Isang maliit na mesa sa tabi ng kama para sa mga personal na gamit at pangangailangan ng pasyente.',example:'Ilagay ang basong tubig ng pasyente sa bedside table na maaabot niya.'}},
+    
+    // Left wall - Medical equipment
+    {id:'monitor',gridX:1,gridY:2,gridW:4,gridH:4,zIndex:15,img:'monitor',english:{name:'Vital Signs Monitor',description:'A medical device that displays a patient\'s heart rate, blood pressure, and other vital signs.',example:'Check the vital signs monitor every hour to track the patient\'s condition.'},finnish:{name:'Elintoimintojen monitori',description:'Lääketieteellinen laite, joka näyttää potilaan sykkeen, verenpaineen ja muut elintärkeät mittaukset.',example:'Tarkista elintoimintojen monitori tunnin välein potilaan tilan seuraamiseksi.'},tagalog:{name:'Monitor ng Vital Signs',description:'Isang medikal na aparato na nagpapakita ng heart rate, blood pressure, at iba pang vital signs ng pasyente.',example:'Suriin ang monitor ng vital signs bawat oras upang subaybayan ang kondisyon ng pasyente.'}},
+    {id:'blood_pressure',gridX:24,gridY:11,gridW:1,gridH:2,zIndex:20,img:'blood_pressure',english:{name:'Blood Pressure Monitor',description:'A device for measuring blood pressure.',example:'Check the patient\'s blood pressure using the monitor.'},finnish:{name:'Verenpainemittari',description:'Laite verenpaineen mittaamiseen.',example:'Tarkista potilaan verenpaine mittarilla.'},tagalog:{name:'Blood Pressure Monitor',description:'Isang aparato para sukatin ang blood pressure.',example:'Suriin ang blood pressure ng pasyente gamit ang monitor.'}},
+    {id:'med_cabinet',gridX:3,gridY:10,gridW:4,gridH:6,zIndex:15,img:'med_cabinet',hasDetailView:true,english:{name:'Medicine Cabinet',description:'A locked storage unit for medications and medical supplies.',example:'Store controlled medications in the locked medicine cabinet.'},finnish:{name:'Lääkekaappi',description:'Lukittu säilytysyksikkö lääkkeille ja lääketarvikkeille.',example:'Säilytä valvotut lääkkeet lukitussa lääkekaapissa.'},tagalog:{name:'Medicine Cabinet',description:'Isang naka-lock na yunit ng imbakan para sa mga gamot at medikal na supplies.',example:'Iimbak ang mga kontroladong gamot sa naka-lock na medicine cabinet.'}},
+    
+    // Back wall - Sink and call button
+    {id:'sink_medical',gridX:26,gridY:1,gridW:5,gridH:3,zIndex:15,img:'sink_medical',english:{name:'Medical Sink',description:'A sink for washing hands and medical equipment.',example:'Always wash your hands at the medical sink before patient care.'},finnish:{name:'Lääketieteellinen allas',description:'Allas käsien ja lääketieteellisten laitteiden pesuun.',example:'Pese aina kätesi lääketieteellisessä altaassa ennen potilaan hoitoa.'},tagalog:{name:'Medical Sink',description:'Isang lababo para sa paghuhugas ng kamay at medikal na kagamitan.',example:'Laging hugasan ang kamay sa medical sink bago mag-alaga ng pasyente.'}},
+    {id:'call_button',gridX:8,gridY:7,gridW:1,gridH:1,zIndex:25,img:'call_button',english:{name:'Call Button',description:'A button patients press to call for nurse assistance.',example:'If you need help, press the call button and a nurse will come.'},finnish:{name:'Kutsunappi',description:'Nappi, jota potilaat painavat kutsuakseen sairaanhoitajan apua.',example:'Jos tarvitset apua, paina kutsunappia ja sairaanhoitaja tulee.'},tagalog:{name:'Call Button',description:'Isang pindutan na pinipindot ng mga pasyente upang tawagin ang tulong ng nurse.',example:'Kung kailangan mo ng tulong, pindutin ang call button at darating ang nurse.'}},
+    
+    // Front area - Visitor seating
+    {id:'chair_patient',gridX:18,gridY:16,gridW:4,gridH:4,zIndex:20,img:'chair_patient',english:{name:'Patient Chair',description:'A comfortable chair for the patient or visitors.',example:'Help the patient sit in the chair for meals.'},finnish:{name:'Potilastuoli',description:'Mukava tuoli potilaalle tai vierailijoille.',example:'Auta potilasta istumaan tuolissa aterioiden aikana.'},tagalog:{name:'Upuan ng Pasyente',description:'Isang komportableng upuan para sa pasyente o bisita.',example:'Tulungan ang pasyente na maupo sa upuan para sa pagkain.'}},
+    {id:'overbed_table',gridX:1,gridY:1,gridW:5,gridH:3,zIndex:15,img:'overbed_table',english:{name:'Overbed Table',description:'An adjustable table that can be positioned over the bed for eating or activities.',example:'Adjust the overbed table height for the patient\'s meal.'},finnish:{name:'Sängynyli-pöytä',description:'Säädettävä pöytä, joka voidaan sijoittaa sängyn päälle syömistä tai toimintoja varten.',example:'Säädä sängynyli-pöydän korkeus potilaan ateriaa varten.'},tagalog:{name:'Overbed Table',description:'Isang adjustable table na maaaring ilagay sa ibabaw ng kama para sa pagkain o aktibidad.',example:'I-adjust ang taas ng overbed table para sa pagkain ng pasyente.'}},
+    
+    // Corner equipment
+    {id:'oxygen',gridX:27,gridY:13,gridW:2,gridH:4,zIndex:20,img:'oxygen',english:{name:'Oxygen Tank',description:'A container of compressed oxygen for patients who need breathing assistance.',example:'Monitor the oxygen tank levels regularly to ensure continuous supply.'},finnish:{name:'Happisäiliö',description:'Paineistetun hapen säiliö potilaille, jotka tarvitsevat hengitysapua.',example:'Tarkista happipullon tasot säännöllisesti jatkuvan syötön varmistamiseksi.'},tagalog:{name:'Oxygen Tank',description:'Isang lalagyan ng compressed oxygen para sa mga pasyenteng nangangailangan ng tulong sa paghinga.',example:'Regular na subaybayan ang lebel ng oxygen tank upang masigurong tuloy-tuloy ang supply.'}},
+    {id:'trash_medical',gridX:24,gridY:19,gridW:2,gridH:3,zIndex:20,img:'trash_medical',english:{name:'Medical Waste Bin',description:'A special container for disposing of medical waste safely.',example:'Dispose of used syringes in the medical waste bin.'},finnish:{name:'Lääkejäteastia',description:'Erityinen astia lääkejätteiden turvalliseen hävittämiseen.',example:'Hävitä käytetyt ruiskut lääkejäteastiaan.'},tagalog:{name:'Medical Waste Bin',description:'Isang espesyal na lalagyan para sa ligtas na pagtatapon ng medikal na basura.',example:'Itapon ang ginamit na syringes sa medical waste bin.'}}
+  ]
+};
+
+// ============================================
+// SHOWCASE COMPONENTS DATA
+// ============================================
+const showcaseData = {
+  bed: [
+    {img:'mattress',english:{name:'Mattress',description:'The cushioned part of a bed that provides comfort and support for sleeping.'},finnish:{name:'Patja',description:'Sängyn pehmustettu osa, joka tarjoaa mukavuutta ja tukea nukkumiseen.'},tagalog:{name:'Mattress',description:'Ang malambot na bahagi ng kama na nagbibigay ng kaginhawahan at suporta sa pagtulog.'}},
+    {img:'bedsheet',english:{name:'Bed Sheet',description:'A large piece of fabric that covers the mattress for hygiene and comfort.'},finnish:{name:'Lakana',description:'Suuri kangaspala, joka peittää patjan hygienian ja mukavuuden vuoksi.'},tagalog:{name:'Bed Sheet',description:'Isang malaking piraso ng tela na tumatakip sa mattress para sa kalinisan at kaginhawahan.'}},
+    {img:'pillow',english:{name:'Pillow',description:'A soft cushion for supporting the head while sleeping or resting.'},finnish:{name:'Tyyny',description:'Pehmeä tyyny pään tukemiseen nukkuessa tai levätessä.'},tagalog:{name:'Unan',description:'Isang malambot na kutson para suportahan ang ulo habang natutulog o nagpapahinga.'}},
+    {img:'pillowcase',english:{name:'Pillowcase',description:'A removable cloth cover for a pillow to keep it clean.'},finnish:{name:'Tyynyliina',description:'Irrotettava kangaspäällinen tyynylle sen pitämiseksi puhtaana.'},tagalog:{name:'Pillowcase',description:'Isang natatanggal na takip na tela para sa unan upang panatilihing malinis.'}},
+    {img:'blanket',english:{name:'Blanket',description:'A large piece of warm fabric used to keep patients comfortable and warm.'},finnish:{name:'Peite',description:'Suuri lämmin kangaspala, jota käytetään potilaiden pitämiseen mukavana ja lämpimänä.'},tagalog:{name:'Kumot',description:'Isang malaking piraso ng mainit na tela na ginagamit upang panatilihing komportable at mainit ang mga pasyente.'}},
+    {img:'fitted_sheet',english:{name:'Fitted Sheet',description:'A sheet with elastic corners that fits tightly over the mattress.'},finnish:{name:'Aluslakana',description:'Lakana joustavilla kulmilla, joka istuu tiukasti patjalle.'},tagalog:{name:'Fitted Sheet',description:'Isang sheet na may elastic sa mga sulok na humahapit nang mahigpit sa mattress.'}},
+    {img:'bed_pad',english:{name:'Bed Pad',description:'A protective absorbent pad placed on the bed to protect the sheets.'},finnish:{name:'Alussuoja',description:'Suojaava imukykyinen alusta, joka asetetaan sängylle suojaamaan lakanoita.'},tagalog:{name:'Bed Pad',description:'Isang protektadong absorbent pad na inilalagay sa kama upang protektahan ang mga sheet.'}},
+    {img:'bed_rail',english:{name:'Bed Rail',description:'A safety barrier on the side of the bed to prevent patients from falling.'},finnish:{name:'Sängynlaita',description:'Turvallisuuseste sängyn sivussa estämään potilaita putoamasta.'},tagalog:{name:'Bed Rail',description:'Isang safety barrier sa gilid ng kama upang pigilan ang mga pasyente sa pagkahulog.'}},
+    {img:'headboard',english:{name:'Headboard',description:'The upright panel at the head of the bed.'},finnish:{name:'Sängynpääty',description:'Pystysuora paneeli sängyn päässä.'},tagalog:{name:'Headboard',description:'Ang nakatayong panel sa ulo ng kama.'}},
+    {img:'footboard',english:{name:'Footboard',description:'The upright panel at the foot of the bed.'},finnish:{name:'Sängynjalkapääty',description:'Pystysuora paneeli sängyn jalkopäässä.'},tagalog:{name:'Footboard',description:'Ang nakatayong panel sa paanan ng kama.'}}
+  ],
+  stove: [
+    {img:'burner',english:{name:'Burner',description:'The heating element on top of a stove used for cooking in pots and pans.'},finnish:{name:'Keittolevy',description:'Lieden päällä oleva lämmityselementti, jota käytetään ruoanlaittoon kattilassa ja pannuissa.'},tagalog:{name:'Burner',description:'Ang heating element sa ibabaw ng kalan na ginagamit sa pagluluto sa kaldero at kawali.'}},
+    {img:'oven',english:{name:'Oven',description:'An enclosed compartment in a stove used for baking and roasting food.'},finnish:{name:'Uuni',description:'Lieden suljettu osasto, jota käytetään ruoan paistamiseen ja paahtamiseen.'},tagalog:{name:'Oven',description:'Isang nakakulong na kompartimento sa kalan na ginagamit sa paghohorno at pag-iihaw ng pagkain.'}},
+    {img:'oven_rack',english:{name:'Oven Rack',description:'A metal grill shelf inside the oven where baking pans are placed.'},finnish:{name:'Uuniritilä',description:'Metallinen ritilähylly uunin sisällä, jolle paistovuoat asetetaan.'},tagalog:{name:'Oven Rack',description:'Isang metal na parilya sa loob ng oven kung saan inilalagay ang mga baking pan.'}},
+    {img:'control_knobs',english:{name:'Control Knobs',description:'Dials used to adjust the temperature and settings of burners and oven.'},finnish:{name:'Säätönupit',description:'Valitsimet, joilla säädetään keittolevyjen ja uunin lämpötilaa ja asetuksia.'},tagalog:{name:'Control Knobs',description:'Mga dial na ginagamit upang i-adjust ang temperatura at settings ng burner at oven.'}},
+    {img:'drip_pan',english:{name:'Drip Pan',description:'A removable tray under the burners that catches spills and drips.'},finnish:{name:'Tippumisvati',description:'Irrotettava levy keittolevyjen alla, joka kerää roiskeet ja tippumat.'},tagalog:{name:'Drip Pan',description:'Isang natatanggal na tray sa ilalim ng mga burner na sumasalo ng mga talsik at patak.'}},
+    {img:'broiler',english:{name:'Broiler',description:'A high-heat element at the top of the oven used for browning and cooking food quickly.'},finnish:{name:'Grilli',description:'Korkean lämmön elementti uunin yläosassa, jota käytetään ruoan ruskistamiseen ja nopeaan kypsyttämiseen.'},tagalog:{name:'Broiler',description:'Isang mataas na init na elemento sa itaas ng oven na ginagamit sa pagbrown at mabilis na pagluluto ng pagkain.'}},
+    {img:'timer',english:{name:'Timer',description:'A device that counts down cooking time and alerts when finished.'},finnish:{name:'Ajastin',description:'Laite, joka laskee valmistusaikaa ja hälyttää, kun se on valmis.'},tagalog:{name:'Timer',description:'Isang aparato na bumibilang ng oras ng pagluluto at nag-aalerto kapag tapos na.'}},
+    {img:'vent_hood',english:{name:'Vent Hood',description:'An exhaust system above the stove that removes smoke, steam, and odors.'},finnish:{name:'Liesituuletin',description:'Poistoilmajärjestelmä lieden yläpuolella, joka poistaa savua, höyryä ja hajuja.'},tagalog:{name:'Vent Hood',description:'Isang exhaust system sa ibabaw ng kalan na nag-aalis ng usok, singaw, at amoy.'}}
+  ],
+  refrigerator: [
+    {img:'fridge_shelf',english:{name:'Refrigerator Shelf',description:'A removable flat surface inside the fridge for storing food items.'},finnish:{name:'Jääkaappihylly',description:'Irrotettava tasainen pinta jääkaapin sisällä ruokatavaroiden säilyttämiseen.'},tagalog:{name:'Refrigerator Shelf',description:'Isang natatanggal na patag na ibabaw sa loob ng ref para sa pag-iimbak ng pagkain.'}},
+    {img:'crisper_drawer',english:{name:'Crisper Drawer',description:'A humidity-controlled drawer at the bottom of the fridge for storing fruits and vegetables.'},finnish:{name:'Vihanneslaatikko',description:'Kosteudensäädetty laatikko jääkaapin alaosassa hedelmien ja vihannesten säilyttämiseen.'},tagalog:{name:'Crisper Drawer',description:'Isang drawer na kontrolado ang kahalumigmigan sa ilalim ng ref para sa pag-iimbak ng prutas at gulay.'}},
+    {img:'door_shelf',english:{name:'Door Shelf',description:'A storage compartment on the refrigerator door for condiments and beverages.'},finnish:{name:'Ovihylly',description:'Säilytysosasto jääkaapin ovessa mausteiden ja juomien säilyttämiseen.'},tagalog:{name:'Door Shelf',description:'Isang kompartimento sa pinto ng refrigerator para sa mga sangkap at inumin.'}},
+    {img:'freezer_compartment',english:{name:'Freezer Compartment',description:'A separate section that keeps food frozen at very cold temperatures.'},finnish:{name:'Pakastinosa',description:'Erillinen osasto, joka pitää ruoan jäässä hyvin kylmissä lämpötiloissa.'},tagalog:{name:'Freezer Compartment',description:'Isang hiwalay na seksyon na nagpapanatiling nagyelo ang pagkain sa napakalalamig na temperatura.'}},
+    {img:'ice_maker',english:{name:'Ice Maker',description:'A built-in device that automatically produces ice cubes.'},finnish:{name:'Jääkoneen',description:'Sisäänrakennettu laite, joka tuottaa automaattisesti jääkuutioita.'},tagalog:{name:'Ice Maker',description:'Isang built-in na aparato na awtomatikong gumagawa ng ice cubes.'}},
+    {img:'temperature_control',english:{name:'Temperature Control',description:'A dial or digital panel to adjust the coldness inside the refrigerator.'},finnish:{name:'Lämpötilansäädin',description:'Valitsin tai digitaalinen paneeli jääkaapin sisälämpötilan säätämiseen.'},tagalog:{name:'Temperature Control',description:'Isang dial o digital panel upang i-adjust ang lamig sa loob ng refrigerator.'}},
+    {img:'fridge_light',english:{name:'Refrigerator Light',description:'An interior light that turns on when the door is opened.'},finnish:{name:'Jääkaappivalo',description:'Sisävalo, joka syttyy, kun ovi avataan.'},tagalog:{name:'Refrigerator Light',description:'Isang loob na ilaw na bumubukas kapag binuksan ang pinto.'}},
+    {img:'butter_compartment',english:{name:'Butter Compartment',description:'A small covered section designed to keep butter at a spreadable temperature.'},finnish:{name:'Voilokero',description:'Pieni katettu osasto, joka on suunniteltu pitämään voi levitettävässä lämpötilassa.'},tagalog:{name:'Butter Compartment',description:'Isang maliit na takip na seksyon na dinisenyo upang panatilihin ang mantikilya sa temperatura na madaling ipahid.'}}
+  ],
+  med_cabinet: [
+    {img:'syringe',english:{name:'Syringe',description:'A medical device with a needle used to inject medications or withdraw fluids.'},finnish:{name:'Ruisku',description:'Lääketieteellinen laite, jossa on neula, jota käytetään lääkkeiden injektoimiseen tai nesteiden poistamiseen.'},tagalog:{name:'Syringe',description:'Isang medikal na aparato na may karayom na ginagamit sa pagturok ng gamot o pag-withdraw ng likido.'}},
+    {img:'bandages',english:{name:'Bandages',description:'Strips of material used to cover and protect wounds.'},finnish:{name:'Sidokset',description:'Materiaalinauhoja, joita käytetään haavojen peittämiseen ja suojaamiseen.'},tagalog:{name:'Bandages',description:'Mga strip ng materyales na ginagamit upang takpan at protektahan ang mga sugat.'}},
+    {img:'gauze',english:{name:'Gauze',description:'Thin, loosely woven fabric used for dressing wounds and absorbing blood.'},finnish:{name:'Harsotaitos',description:'Ohut, löysästi kudottu kangas haavojen sidontaan ja veren imeyttämiseen.'},tagalog:{name:'Gauze',description:'Manipis, maluwag na hinabi na tela na ginagamit sa pagbebenda ng mga sugat at pagsipsip ng dugo.'}},
+    {img:'antiseptic',english:{name:'Antiseptic',description:'A disinfectant solution used to prevent infection in wounds.'},finnish:{name:'Antiseptinen liuos',description:'Desinfiointiaine, jota käytetään infektioiden estämiseen haavoissa.'},tagalog:{name:'Antiseptic',description:'Isang disinfectant na solusyon na ginagamit upang maiwasan ang impeksyon sa mga sugat.'}},
+    {img:'thermometer',english:{name:'Medical Thermometer',description:'A device used to measure body temperature.'},finnish:{name:'Kuumemittari',description:'Laite, jota käytetään kehon lämpötilan mittaamiseen.'},tagalog:{name:'Medical Thermometer',description:'Isang aparato na ginagamit upang sukatin ang temperatura ng katawan.'}},
+    {img:'medical_gloves',english:{name:'Medical Gloves',description:'Disposable gloves worn to maintain hygiene and prevent contamination.'},finnish:{name:'Lääkintähanskat',description:'Kertakäyttöiset hanskat, joita käytetään hygienian ylläpitämiseen ja kontaminaation estämiseen.'},tagalog:{name:'Medical Gloves',description:'Disposable na guwantes na isinusuot upang mapanatili ang kalinisan at maiwasan ang kontaminasyon.'}},
+    {img:'medical_scissors',english:{name:'Medical Scissors',description:'Sharp cutting tools used to cut bandages, gauze, and medical tape.'},finnish:{name:'Lääketieteelliset sakset',description:'Terävät leikkaustyökalut, joita käytetään sidosten, harsojen ja lääketeippien leikkaamiseen.'},tagalog:{name:'Medical Scissors',description:'Matalas na kagamitan sa pagputol na ginagamit sa pagputol ng bandages, gauze, at medical tape.'}},
+    {img:'medical_tape',english:{name:'Medical Tape',description:'Adhesive tape used to secure bandages and dressings in place.'},finnish:{name:'Lääketeippi',description:'Liimateippi, jota käytetään sidosten ja siteiden kiinnittämiseen paikoilleen.'},tagalog:{name:'Medical Tape',description:'Adhesive tape na ginagamit upang i-secure ang mga bandages at dressings sa lugar.'}},
+    {img:'cotton_balls',english:{name:'Cotton Balls',description:'Small balls of cotton used to apply medication or clean wounds.'},finnish:{name:'Pumpulipallot',description:'Pieniä pumpulipalloja, joita käytetään lääkkeiden levittämiseen tai haavojen puhdistamiseen.'},tagalog:{name:'Cotton Balls',description:'Maliliit na bola ng bulak na ginagamit sa paglagay ng gamot o paglilinis ng mga sugat.'}},
+    {img:'alcohol_wipes',english:{name:'Alcohol Wipes',description:'Pre-moistened wipes with alcohol used to disinfect skin and medical equipment.'},finnish:{name:'Alkoholipyyhkeet',description:'Valmiiksi kostutetut pyyhkeet alkoholilla, joita käytetään ihon ja lääketieteellisten laitteiden desinfiointiin.'},tagalog:{name:'Alcohol Wipes',description:'Pre-moistened na wipes na may alkohol na ginagamit sa pag-disinfect ng balat at medikal na kagamitan.'}}
+  ],
+  pantry: [
+    {img:'rice',english:{name:'Rice',description:'A staple grain used as a base for many meals and side dishes.'},finnish:{name:'Riisi',description:'Perusviljaa, jota käytetään monien aterioiden ja lisäkkeiden pohjana.'},tagalog:{name:'Bigas',description:'Isang pangunahing butil na ginagamit bilang base para sa maraming pagkain at side dishes.'}},
+    {img:'pasta',english:{name:'Pasta',description:'Dried wheat noodles in various shapes, cooked in boiling water.'},finnish:{name:'Pasta',description:'Kuivattuja vehnänuudeleita eri muodoissa, keitetään kiehuvassa vedessä.'},tagalog:{name:'Pasta',description:'Tuyong wheat noodles sa iba\'t ibang hugis, niluluto sa kumukulo na tubig.'}},
+    {img:'canned_beans',english:{name:'Canned Beans',description:'Preserved beans in a can, ready to use for meals.'},finnish:{name:'Säilykkeet pavut',description:'Säilytetyt pavut tölkissä, valmiina käytettäväksi aterioihin.'},tagalog:{name:'De-latang Beans',description:'Nakapreserba na beans sa lata, handa nang gamitin sa pagkain.'}},
+    {img:'canned_soup',english:{name:'Canned Soup',description:'Pre-made soup in a can that can be heated and served quickly.'},finnish:{name:'Keitto säilykkeessä',description:'Valmis keitto tölkissä, joka voidaan lämmittää ja tarjoilla nopeasti.'},tagalog:{name:'De-latang Sopas',description:'Pre-made na sopas sa lata na pwedeng initin at ihain nang mabilis.'}},
+    {img:'bread',english:{name:'Bread',description:'Baked food made from flour, used for sandwiches and meals.'},finnish:{name:'Leipä',description:'Jauhoista leivottu ruoka, käytetään voileipiin ja aterioihin.'},tagalog:{name:'Tinapay',description:'Nilutong pagkain na gawa sa harina, ginagamit sa sandwich at pagkain.'}},
+    {img:'cereal',english:{name:'Cereal',description:'Breakfast food made from processed grains, often eaten with milk.'},finnish:{name:'Murot',description:'Aamiainen valmistettu jalostetuista viljasta, syödään usein maidon kanssa.'},tagalog:{name:'Cereal',description:'Pagkain sa almusal na gawa sa processed grains, karaniwang kinakain na may gatas.'}},
+    {img:'flour',english:{name:'Flour',description:'Finely ground wheat powder used for baking and cooking.'},finnish:{name:'Jauho',description:'Hienoksi jauhettua vehnäjauhoa, käytetään leipomiseen ja ruoanlaittoon.'},tagalog:{name:'Harina',description:'Pinong giniling na wheat powder na ginagamit sa pagluluto at paghohorno.'}},
+    {img:'sugar',english:{name:'Sugar',description:'Sweet crystalline substance used to sweeten food and drinks.'},finnish:{name:'Sokeri',description:'Makea kiteinen aine, jota käytetään ruoan ja juomien makeutamiseen.'},tagalog:{name:'Asukal',description:'Matamis na crystalline na sangkap na ginagamit upang pagtamisan ang pagkain at inumin.'}},
+    {img:'cooking_oil',english:{name:'Cooking Oil',description:'Liquid fat used for frying, baking, and food preparation.'},finnish:{name:'Ruokaöljy',description:'Nestemäistä rasvaa, jota käytetään paistamiseen, leipomiseen ja ruoan valmistukseen.'},tagalog:{name:'Mantika',description:'Likidong taba na ginagamit sa pagprito, paghohorno, at paghahanda ng pagkain.'}},
+    {img:'salt',english:{name:'Salt',description:'White crystalline mineral used to season and preserve food.'},finnish:{name:'Suola',description:'Valkoinen kiteinen mineraali, jota käytetään ruoan maustamiseen ja säilyttämiseen.'},tagalog:{name:'Asin',description:'Puting crystalline mineral na ginagamit upang timplahan at preservahin ang pagkain.'}}
+  ]
+};
+
+// ============================================
+// INITIALIZATION
+// ============================================
+window.onload = function() {
+  can = document.getElementById('gameCanvas');
+  ctx = can.getContext('2d');
+  can.width = COLS * GRID_SIZE;
+  can.height = ROWS * GRID_SIZE;
+  
+  loadImages();
+  initNPCs();
+  
+  // Register service worker for PWA functionality
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('Service Worker registered'))
+      .catch(err => console.log('Service Worker registration failed:', err));
+  }
+  
+  // PWA install prompt
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // Show custom install UI if desired
+    console.log('App can be installed');
+  });
+}
+  
+  document.addEventListener('keydown', onKeyDown);
+  document.addEventListener('keyup', onKeyUp);
+  can.addEventListener('click', onClick);
+  can.addEventListener('mousemove', onMouseMove);
+  
+  window.speechSynthesis.getVoices();
+  
+  // Start NPC wandering - more frequent updates for active movement
+  setInterval(updateNPCs, 800); // 0.8 seconds = more active wandering
+};
+
+// ============================================
+// NPC SYSTEM
+// ============================================
+
+// ============================================
+// ⚙️ KÄVELTÄVÄ - WALKABLE AREA ADJUSTMENT
+// ============================================
+// 📝 CHANGE THESE COORDINATES TO ADJUST WHERE PLAYERS AND NPCs CAN WALK
+// Room size: 32 columns (0-31) × 24 rows (0-23)
+// Each corner is defined by X (horizontal) and Y (vertical) coordinates
+//
+// INSTRUCTIONS:
+// 1. Find the corner you want to move (topCorner, rightCorner, bottomCorner, leftCorner)
+// 2. Change the x or y value
+// 3. Lower Y = higher on screen, Higher Y = lower on screen
+// 4. Lower X = more left, Higher X = more right
+//
+// EXAMPLES:
+// - Make area larger: Move corners further apart
+// - Make area smaller: Move corners closer together
+// - Move entire area: Change all corners equally
+//
+// TIP: Use the debug version with grid to see exact coordinates!
+// ============================================
+
+const WALKABLE_POLYGON = {
+  topCorner: { x: 16, y: 8 },       // 🔺 TOP CORNER - Center top
+  rightCorner: { x: 23, y: 15 },    // ▶️ RIGHT CORNER - Far right, middle
+  bottomCorner: { x: 16, y: 23 },   // 🔻 BOTTOM CORNER - Center bottom
+  leftCorner: { x: 7, y: 15 }       // ◀️ LEFT CORNER - Far left, middle
+};
+
+// ⚠️ IMPORTANT: After changing corners above, update these bounds to match:
+// Set minX to the smallest X value, maxX to largest X
+// Set minY to the smallest Y value, maxY to largest Y
+const PATIENT_ROOM_WALLS = {
+  minX: 7,   // ← Left edge (leftCorner.x)
+  maxX: 23,  // ← Right edge (rightCorner.x)
+  minY: 8,   // ← Top edge (topCorner.y)
+  maxY: 23   // ← Bottom edge (bottomCorner.y)
+};
+
+// ============================================
+// 📊 CURRENT WALKABLE AREA SHAPE:
+// ============================================
+//
+//          TOP (16,8)
+//              ◆
+//             /█\      ← Filled diagonal sides
+//            /███\        (smooth & straight)
+//           /█████\
+//          /███████\
+//         /█████████\
+// LEFT   ◆───────────◆   RIGHT
+// (7,15)              (23,15)
+//         \█████████/
+//          \███████/
+//           \█████/
+//            \███/
+//             \█/
+//              ◆
+//        BOTTOM (16,23)
+//
+// Diamond with filled straight diagonal sides!
+// ============================================
+
+// No separate blocked zone - everything outside polygon is blocked
+const NPC_BLOCKED_ZONE = {
+  x: 0,
+  y: 0,
+  width: 0,
+  height: 0
+};
+
+// ============================================
+// DIAGONAL EDGE FILL POLYGONS
+// These additional polygons smooth out the diagonal edges
+// ============================================
+
+// Top-Left diagonal fill (from top to left)
+const FILL_TOP_LEFT = [
+  { x: 16, y: 8 },
+  { x: 15, y: 9 },
+  { x: 14, y: 10 },
+  { x: 13, y: 11 },
+  { x: 12, y: 12 },
+  { x: 11, y: 13 },
+  { x: 10, y: 14 },
+  { x: 9, y: 14 },
+  { x: 8, y: 15 },
+  { x: 7, y: 15 }
+];
+
+// Top-Right diagonal fill (from top to right)
+const FILL_TOP_RIGHT = [
+  { x: 16, y: 8 },
+  { x: 17, y: 9 },
+  { x: 18, y: 10 },
+  { x: 19, y: 11 },
+  { x: 20, y: 12 },
+  { x: 21, y: 13 },
+  { x: 22, y: 14 },
+  { x: 23, y: 14 },
+  { x: 23, y: 15 }
+];
+
+// Bottom-Left diagonal fill (from left to bottom)
+const FILL_BOTTOM_LEFT = [
+  { x: 7, y: 15 },
+  { x: 8, y: 16 },
+  { x: 9, y: 17 },
+  { x: 10, y: 18 },
+  { x: 11, y: 19 },
+  { x: 12, y: 20 },
+  { x: 13, y: 21 },
+  { x: 14, y: 22 },
+  { x: 15, y: 22 },
+  { x: 16, y: 23 }
+];
+
+// Bottom-Right diagonal fill (from right to bottom)
+const FILL_BOTTOM_RIGHT = [
+  { x: 23, y: 15 },
+  { x: 22, y: 16 },
+  { x: 21, y: 17 },
+  { x: 20, y: 18 },
+  { x: 19, y: 19 },
+  { x: 18, y: 20 },
+  { x: 17, y: 21 },
+  { x: 16, y: 22 },
+  { x: 16, y: 23 }
+];
+
+// Check if point is on any diagonal fill line
+function isOnDiagonalFill(x, y) {
+  // Check all four diagonal fills
+  const allFills = [FILL_TOP_LEFT, FILL_TOP_RIGHT, FILL_BOTTOM_LEFT, FILL_BOTTOM_RIGHT];
+  
+  for (let fill of allFills) {
+    for (let point of fill) {
+      if (x === point.x && y === point.y) {
+        return true;
+      }
+    }
+  }
+  
+  return false;
+}
+
+// Point-in-polygon detection using ray-casting algorithm
+function isPointInPolygon(x, y, polygon) {
+  // Polygon vertices in clockwise order
+  const vertices = [
+    polygon.topCorner,
+    polygon.rightCorner,
+    polygon.bottomCorner,
+    polygon.leftCorner
+  ];
+  
+  let inside = false;
+  for (let i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {
+    const xi = vertices[i].x, yi = vertices[i].y;
+    const xj = vertices[j].x, yj = vertices[j].y;
+    
+    const intersect = ((yi > y) !== (yj > y))
+        && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  
+  return inside;
+}
+
+function initNPCs() {
+  // Only spawn NPCs in patient room
+  const npcSprites = ['npc_patient1', 'npc_patient2', 'npc_patient3', 'npc_patient4'];
+  const npcCount = 4;
+  
+  // Spawn NPCs within the polygon walkable area
+  const spawnPositions = [
+    { x: 10, y: 15 },   // Left-center
+    { x: 16, y: 18 },   // Center
+    { x: 22, y: 15 },   // Right-center
+    { x: 10, y: 18 }    // Left-lower
+  ];
+  
+  for (let i = 0; i < npcCount; i++) {
+    npcs.push({
+      id: 'npc_' + i,
+      gridX: spawnPositions[i].x,
+      gridY: spawnPositions[i].y,
+      sprite: npcSprites[i],
+      complaint: npcComplaints[i % npcComplaints.length],
+      room: 'patient',
+      moveTimer: Math.random() * 2000,
+      dir: 'down',  // Track direction for animation
+      animFrame: 0,  // Animation frame (0-2)
+      frame: 0,      // Frame counter for animation timing
+      isMoving: false // Track if NPC is currently moving
+    });
+  }
+}
+
+function isInPatientFloorArea(x, y) {
+  // Check main polygon
+  if (isPointInPolygon(x, y, WALKABLE_POLYGON)) {
+    return true;
+  }
+  
+  // Check diagonal edge fills for smooth sides
+  if (isOnDiagonalFill(x, y)) {
+    return true;
+  }
+  
+  return false;
+}
+
+function updateNPCs() {
+  npcs.forEach(npc => {
+    if (npc.room !== room) return;
+    
+    // More random movement - 80% chance to move
+    if (Math.random() < 0.8) {
+      const dir = Math.floor(Math.random() * 4);
+      let newX = npc.gridX;
+      let newY = npc.gridY;
+      
+      // Variable movement distance (1-3 grid cells)
+      const distance = Math.floor(Math.random() * 3) + 1;
+      
+      // Update direction tracking
+      switch(dir) {
+        case 0: 
+          newY -= distance;
+          npc.dir = 'up';
+          break;
+        case 1: 
+          newY += distance;
+          npc.dir = 'down';
+          break;
+        case 2: 
+          newX -= distance;
+          npc.dir = 'left';
+          break;
+        case 3: 
+          newX += distance;
+          npc.dir = 'right';
+          break;
+      }
+      
+      // Check if in floor area (patient room only)
+      if (npc.room === 'patient') {
+        if (!isInPatientFloorArea(newX, newY)) {
+          npc.isMoving = false;
+          return; // Don't move into blocked areas
+        }
+      }
+      
+      // Check bounds and collisions
+      if (newX >= 0 && newX < COLS - 2 && newY >= 0 && newY < ROWS - 2) {
+        if (!collides(newX, newY) && !npcCollides(npc.id, newX, newY)) {
+          npc.gridX = newX;
+          npc.gridY = newY;
+          npc.isMoving = true;
+          
+          // Update animation frame
+          npc.frame++;
+          if (npc.frame % 8 === 0) {
+            npc.animFrame = (npc.animFrame + 1) % 3;
+          }
+        } else {
+          npc.isMoving = false;
+        }
+      } else {
+        npc.isMoving = false;
+      }
+    } else {
+      npc.isMoving = false;
+      npc.animFrame = 0; // Reset to idle when not moving
+    }
+  });
+  
+  draw();
+}
+
+function npcCollides(npcId, x, y) {
+  for (let npc of npcs) {
+    if (npc.id === npcId) continue;
+    if (Math.abs(npc.gridX - x) < 3 && Math.abs(npc.gridY - y) < 3) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function findNPCAt(px, py) {
+  const currentNPCs = npcs.filter(n => n.room === room);
+  
+  for (let npc of currentNPCs) {
+    const x = npc.gridX * GRID_SIZE;
+    const y = npc.gridY * GRID_SIZE;
+    
+    // First check bounding box
+    if (px >= x - CLICK_PADDING && px <= x + NPC_WIDTH + CLICK_PADDING &&
+        py >= y - CLICK_PADDING && py <= y + NPC_HEIGHT + CLICK_PADDING) {
+      
+      // If NPC has an image, check pixel-perfect collision
+      const npcImg = images[npc.sprite];
+      if (npcImg && npcImg.complete) {
+        if (isPixelSolid(npcImg, px - x, py - y, NPC_WIDTH, NPC_HEIGHT)) {
+          return npc;
+        }
+      } else {
+        // No image loaded, use bounding box
+        return npc;
+      }
+    }
+  }
+  
+  return null;
+}
+
+// ============================================
+// IMAGE LOADING
+// ============================================
+function loadImages() {
+  const total = Object.keys(imageUrls).length;
+  
+  for (let key in imageUrls) {
+    const img = new Image();
+    img.onload = () => {
+      imagesLoaded++;
+      if (imagesLoaded === total) {
+        console.log('All images loaded!');
+        draw();
+      }
+    };
+    img.onerror = () => {
+      console.warn(`Failed to load image: ${imageUrls[key]}`);
+      imagesLoaded++;
+      if (imagesLoaded === total) {
+        draw();
+      }
+    };
+    img.src = imageUrls[key];
+    images[key] = img;
+  }
+}
+
+// ============================================
+// LANGUAGE SELECTION
+// ============================================
+function toggleLang(lang, elem) {
+  const checkbox = document.getElementById('lang-' + lang);
+  
+  if (checkbox.checked) {
+    checkbox.checked = false;
+    elem.classList.remove('selected');
+    selectedLangs = selectedLangs.filter(l => l !== lang);
+  } else {
+    if (selectedLangs.length < 2) {
+      checkbox.checked = true;
+      elem.classList.add('selected');
+      selectedLangs.push(lang);
+    }
+  }
+  
+  document.getElementById('langError').style.display = 'none';
+}
+
+function startGame() {
+  if (selectedLangs.length !== 2) {
+    document.getElementById('langError').style.display = 'block';
+    return;
+  }
+  
+  document.getElementById('langModal').style.display = 'none';
+  document.getElementById('instructModal').style.display = 'flex';
+}
+
+function closeInstructions() {
+  document.getElementById('instructModal').style.display = 'none';
+  draw();
+}
+
+// ============================================
+// INPUT HANDLING
+// ============================================
+const keys = {};
+
+function onKeyDown(e) {
+  let wasMoving = keys.up || keys.down || keys.left || keys.right;
+  
+  if (e.key.toLowerCase() === 'w' || e.key === 'ArrowUp') {
+    keys.up = true;
+    e.preventDefault();
+  }
+  if (e.key.toLowerCase() === 's' || e.key === 'ArrowDown') {
+    keys.down = true;
+    e.preventDefault();
+  }
+  if (e.key.toLowerCase() === 'a' || e.key === 'ArrowLeft') {
+    keys.left = true;
+    e.preventDefault();
+  }
+  if (e.key.toLowerCase() === 'd' || e.key === 'ArrowRight') {
+    keys.right = true;
+    e.preventDefault();
+  }
+  
+  keyPressed = true;
+  
+  // Start smooth movement loop if not already moving
+  if (!wasMoving) {
+    startMovement();
+  }
+}
+
+function onKeyUp(e) {
+  if (e.key.toLowerCase() === 'w' || e.key === 'ArrowUp') keys.up = false;
+  if (e.key.toLowerCase() === 's' || e.key === 'ArrowDown') keys.down = false;
+  if (e.key.toLowerCase() === 'a' || e.key === 'ArrowLeft') keys.left = false;
+  if (e.key.toLowerCase() === 'd' || e.key === 'ArrowRight') keys.right = false;
+  
+  if (!keys.up && !keys.down && !keys.left && !keys.right) {
+    keyPressed = false;
+    char.animFrame = 0;
+    // Animation loop will stop automatically when no keys pressed
+  }
+}
+
+function onMouseMove(e) {
+  const rect = can.getBoundingClientRect();
+  const scaleX = can.width / rect.width;
+  const scaleY = can.height / rect.height;
+  
+  mouseX = (e.clientX - rect.left) * scaleX;
+  mouseY = (e.clientY - rect.top) * scaleY;
+  
+  updateHoveredObject();
+  updateHoveredNPC();
+  draw();
+}
+
+function onClick(e) {
+  const rect = can.getBoundingClientRect();
+  const scaleX = can.width / rect.width;
+  const scaleY = can.height / rect.height;
+  
+  const clickX = (e.clientX - rect.left) * scaleX;
+  const clickY = (e.clientY - rect.top) * scaleY;
+  
+  // Check NPCs first
+  const clickedNPC = findNPCAt(clickX, clickY);
+  if (clickedNPC) {
+    sel = clickedNPC;
+    showNPCPopup();
+    return;
+  }
+  
+  // Then check objects
+  const clickedObj = findObjectAt(clickX, clickY);
+  if (clickedObj) {
+    sel = clickedObj;
+    showPopup();
+  }
+}
+
+// ============================================
+// COLLISION DETECTION
+// ============================================
+function updateHoveredObject() {
+  hoveredObject = findObjectAt(mouseX, mouseY);
+}
+
+function updateHoveredNPC() {
+  hoveredNPC = findNPCAt(mouseX, mouseY);
+}
+
+function findObjectAt(px, py) {
+  const currentObjs = objs[room] || [];
+  
+  // Sort objects by zIndex in descending order (highest zIndex first)
+  // This ensures objects that appear "in front" are checked first
+  const sortedObjs = [...currentObjs].sort((a, b) => (b.zIndex || 0) - (a.zIndex || 0));
+  
+  for (let i = 0; i < sortedObjs.length; i++) {
+    const o = sortedObjs[i];
+    const x = o.gridX * GRID_SIZE;
+    const y = o.gridY * GRID_SIZE;
+    const w = o.gridW * GRID_SIZE;
+    const h = o.gridH * GRID_SIZE;
+    
+    // First check if click is within bounding box
+    if (px >= x - CLICK_PADDING && px <= x + w + CLICK_PADDING &&
+        py >= y - CLICK_PADDING && py <= y + h + CLICK_PADDING) {
+      
+      // If object has an image, check pixel-perfect collision
+      const img = images[o.img];
+      if (img && img.complete) {
+        if (isPixelSolid(img, px - x, py - y, w, h)) {
+          return o;
+        }
+      } else {
+        // No image loaded, use bounding box
+        return o;
+      }
+    }
+  }
+  
+  return null;
+}
+
+// Check if a pixel in the image is solid (not transparent)
+function isPixelSolid(img, localX, localY, drawWidth, drawHeight) {
+  try {
+    // Create a temporary canvas to read pixel data
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = drawWidth;
+    tempCanvas.height = drawHeight;
+    const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+    
+    // Draw the image to the temporary canvas
+    tempCtx.drawImage(img, 0, 0, drawWidth, drawHeight);
+    
+    // Check if coordinates are within bounds
+    if (localX < 0 || localX >= drawWidth || localY < 0 || localY >= drawHeight) {
+      return false;
+    }
+    
+    // Get pixel data at the clicked position
+    const pixelData = tempCtx.getImageData(Math.floor(localX), Math.floor(localY), 1, 1).data;
+    
+    // Check alpha channel (index 3) - if alpha > 50, consider it solid
+    return pixelData[3] > 50;
+  } catch (e) {
+    // If we can't read pixel data (CORS issues, etc.), fall back to bounding box
+    return true;
+  }
+}
+
+function collides(newX, newY) {
+  // Check room boundaries
+  if (newX < 0 || newX >= COLS || newY < 0 || newY >= ROWS) return true;
+  
+  // In patient room, check if player is in walkable area
+  if (room === 'patient') {
+    // Check if player is outside the walkable bounds
+    if (!isInPatientFloorArea(newX, newY)) {
+      return true; // Collides with unwalkable area
+    }
+  }
+  
+  const currentObjs = objs[room] || [];
+  
+  // Character hitbox - use full character size (48x48)
+  const charLeft = newX * GRID_SIZE;
+  const charRight = newX * GRID_SIZE + W;
+  const charTop = newY * GRID_SIZE;
+  const charBottom = newY * GRID_SIZE + H;
+  
+  // Check collision with all objects - collision box is 50% of visual size (centered)
+  for (let o of currentObjs) {
+    // Calculate full object dimensions
+    const fullWidth = o.gridW * GRID_SIZE;
+    const fullHeight = o.gridH * GRID_SIZE;
+    
+    // Reduce collision box to 50% of original size by adding 25% padding on each side
+    const padding = 0.25; // 25% padding on each side = 50% total reduction
+    const objLeft = o.gridX * GRID_SIZE + (fullWidth * padding);
+    const objRight = (o.gridX + o.gridW) * GRID_SIZE - (fullWidth * padding);
+    const objTop = o.gridY * GRID_SIZE + (fullHeight * padding);
+    const objBottom = (o.gridY + o.gridH) * GRID_SIZE - (fullHeight * padding);
+    
+    // AABB collision detection
+    if (charRight > objLeft && 
+        charLeft < objRight && 
+        charBottom > objTop && 
+        charTop < objBottom) {
+      return true; // Collision detected
+    }
+  }
+  
+  return false;
+}
+
+// ============================================
+// CHARACTER MOVEMENT - SMOOTH AND SLOW
+// ============================================
+let animationFrameId = null;
+
+function updateCharacter() {
+  let moved = false;
+  let newX = char.gridX;
+  let newY = char.gridY;
+  
+  // Apply movement based on key presses
+  if (keys.up) {
+    newY -= MOVE_SPEED;
+    char.dir = 'up';
+    moved = true;
+  } else if (keys.down) {
+    newY += MOVE_SPEED;
+    char.dir = 'down';
+    moved = true;
+  }
+  
+  if (keys.left) {
+    newX -= MOVE_SPEED;
+    char.dir = 'left';
+    moved = true;
+  } else if (keys.right) {
+    newX += MOVE_SPEED;
+    char.dir = 'right';
+    moved = true;
+  }
+  
+  // Only move if no collision
+  if (moved && !collides(newX, newY)) {
+    char.gridX = newX;
+    char.gridY = newY;
+    
+    // Update animation frame
+    char.frame++;
+    if (char.frame % 8 === 0) { // Slower animation (was 5, now 8)
+      char.animFrame = (char.animFrame + 1) % 3;
+    }
+  }
+  
+  draw();
+  
+  // Continue animation loop if still moving
+  if (moved) {
+    animationFrameId = requestAnimationFrame(updateCharacter);
+  } else {
+    animationFrameId = null;
+  }
+}
+
+// Start movement loop when key is pressed
+function startMovement() {
+  if (!animationFrameId) {
+    updateCharacter();
+  }
+}
+
+// ============================================
+// RENDERING
+// ============================================
+function draw() {
+  ctx.clearRect(0, 0, can.width, can.height);
+  
+  // Draw background FIRST (zIndex = 0, furthest back)
+  if (room === 'kitchen') {
+    drawRoomBackground('room_kitchen');
+  } else if (room === 'bed_detail') {
+    drawRoomBackground('bed_detail');
+  } else {
+    drawRoomBackground('room_patient');
+  }
+  
+  // Get objects for current room and sort by zIndex (low to high)
+  const currentObjs = objs[room] || [];
+  const sortedObjs = [...currentObjs].sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0));
+  
+  // Draw objects in zIndex order (background is already drawn, so these are on top)
+  sortedObjs.forEach(drawObject);
+  
+  // Draw NPCs in current room (they appear on top of most objects)
+  const currentNPCs = npcs.filter(n => n.room === room);
+  currentNPCs.forEach(drawNPC);
+  
+  // Draw player character LAST (always on top)
+  drawMario();
+}
+
+function drawRoomBackground(roomKey) {
+  const roomImg = images[roomKey];
+  
+  if (roomImg && roomImg.complete) {
+    if (roomKey === 'room_kitchen') {
+      // Kitchen image is 1344x768 (aspect ratio 1.75:1)
+      // Canvas is 640x480 (aspect ratio 1.33:1)
+      // Scale to fit width while maintaining aspect ratio
+      const imgWidth = 1344;
+      const imgHeight = 768;
+      const canvasWidth = can.width;
+      const canvasHeight = can.height;
+      
+      // Calculate scale to fit within canvas
+      const scaleX = canvasWidth / imgWidth;
+      const scaleY = canvasHeight / imgHeight;
+      const scale = Math.min(scaleX, scaleY); // Use smaller scale to fit completely
+      
+      const drawWidth = imgWidth * scale;
+      const drawHeight = imgHeight * scale;
+      
+      // Center the image
+      const offsetX = (canvasWidth - drawWidth) / 2;
+      const offsetY = (canvasHeight - drawHeight) / 2;
+      
+      ctx.drawImage(roomImg, offsetX, offsetY, drawWidth, drawHeight);
+    } else {
+      // Other rooms at normal canvas size
+      ctx.drawImage(roomImg, 0, 0, can.width, can.height);
+    }
+  } else {
+    // Fallback background colors
+    if (room === 'kitchen') {
+      ctx.fillStyle = '#42372f';
+    } else if (room === 'bed_detail') {
+      ctx.fillStyle = '#f5f5f5'; // Light gray for bed component showcase
+    } else {
+      ctx.fillStyle = '#e8f4f8';
+    }
+    ctx.fillRect(0, 0, can.width, can.height);
+  }
+}
+
+function drawObject(o) {
+  const x = o.gridX * GRID_SIZE;
+  const y = o.gridY * GRID_SIZE;
+  const w = o.gridW * GRID_SIZE;
+  const h = o.gridH * GRID_SIZE;
+  
+  const isHovered = hoveredObject && hoveredObject.id === o.id;
+  
+  const img = images[o.img];
+  
+  // Save context state before any drawing
+  ctx.save();
+  
+  // Draw the object with thick, smooth light blue glow if hovered
+  if (img && img.complete) {
+    if (isHovered) {
+      // Draw thick light blue glow that follows pixel shape and overlaps into image
+      const offsets = [
+        // Cardinals (main directions) - increased range
+        [-4, 0], [4, 0], [0, -4], [0, 4],
+        [-3, 0], [3, 0], [0, -3], [0, 3],
+        [-2, 0], [2, 0], [0, -2], [0, 2],
+        [-1, 0], [1, 0], [0, -1], [0, 1],
+        // Diagonals for smoothness - increased range
+        [-3, -3], [3, -3], [-3, 3], [3, 3],
+        [-3, -2], [3, -2], [-3, 2], [3, 2],
+        [-2, -3], [2, -3], [-2, 3], [2, 3],
+        [-2, -2], [2, -2], [-2, 2], [2, 2],
+        [-2, -1], [2, -1], [-2, 1], [2, 1],
+        [-1, -2], [1, -2], [-1, 2], [1, 2],
+        [-1, -1], [1, -1], [-1, 1], [1, 1]
+      ];
+      
+      for (let [offsetX, offsetY] of offsets) {
+        ctx.shadowColor = 'rgba(100, 180, 255, 1)';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = offsetX;
+        ctx.shadowOffsetY = offsetY;
+        ctx.drawImage(img, x, y, w, h);
+      }
+    }
+    
+    // Reset all shadow properties before drawing the actual image
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    
+    // Draw the actual image normally
+    ctx.drawImage(img, x, y, w, h);
+  } else {
+    // Draw textured bed components when in bed_detail room
+    if (room === 'bed_detail') {
+      drawBedComponentTexture(o, x, y, w, h);
+    } else {
+      // Default placeholder for other objects
+      ctx.fillStyle = '#cccccc';
+      ctx.fillRect(x, y, w, h);
+      ctx.fillStyle = '#333333';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(o.id, x + w / 2, y + h / 2);
+    }
+    
+    // Thick light blue rectangle outline for non-image objects
+    if (isHovered) {
+      ctx.strokeStyle = 'rgba(100, 180, 255, 1)';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(x, y, w, h);
+    }
+  }
+  
+  // Restore context state to prevent shadow bleeding to other objects
+  ctx.restore();
+}
+
+function drawBedComponentTexture(o, x, y, w, h) {
+  ctx.save();
+  
+  // Different textures based on bed component type
+  switch(o.id) {
+    case 'mattress':
+      // Quilted mattress pattern with 3D effect
+      const gradient1 = ctx.createLinearGradient(x, y, x, y + h);
+      gradient1.addColorStop(0, '#f8f8f8');
+      gradient1.addColorStop(0.5, '#e8e8e8');
+      gradient1.addColorStop(1, '#d8d8d8');
+      ctx.fillStyle = gradient1;
+      ctx.fillRect(x, y, w, h);
+      
+      // Draw quilted diamond pattern with shadow
+      ctx.strokeStyle = '#c0c0c0';
+      ctx.lineWidth = 1.5;
+      for (let i = 0; i < w; i += 12) {
+        for (let j = 0; j < h; j += 12) {
+          ctx.strokeRect(x + i, y + j, 12, 12);
+          // Add button centers
+          ctx.fillStyle = '#a8a8a8';
+          ctx.beginPath();
+          ctx.arc(x + i + 6, y + j + 6, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      // Border
+      ctx.strokeStyle = '#999';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x + 1, y + 1, w - 2, h - 2);
+      
+      ctx.fillStyle = '#555';
+      ctx.font = 'bold 13px Arial';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = 'rgba(255,255,255,0.8)';
+      ctx.shadowBlur = 2;
+      ctx.fillText('Mattress', x + w/2, y + h/2);
+      break;
+      
+    case 'bedsheet':
+      // Smooth cotton sheet with realistic folds
+      const gradient2 = ctx.createLinearGradient(x, y, x + w, y + h);
+      gradient2.addColorStop(0, '#ffffff');
+      gradient2.addColorStop(0.3, '#f5f5f5');
+      gradient2.addColorStop(0.7, '#fafafa');
+      gradient2.addColorStop(1, '#f0f0f0');
+      ctx.fillStyle = gradient2;
+      ctx.fillRect(x, y, w, h);
+      
+      // Draw realistic fabric folds with shadows
+      ctx.strokeStyle = 'rgba(200, 200, 200, 0.4)';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 4; i++) {
+        const yPos = y + (h/4) * i + 5;
+        ctx.beginPath();
+        ctx.moveTo(x, yPos);
+        ctx.quadraticCurveTo(x + w/2, yPos + 8, x + w, yPos + 3);
+        ctx.stroke();
+        
+        // Shadow under fold
+        ctx.strokeStyle = 'rgba(150, 150, 150, 0.2)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x, yPos + 2);
+        ctx.quadraticCurveTo(x + w/2, yPos + 10, x + w, yPos + 5);
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(200, 200, 200, 0.4)';
+        ctx.lineWidth = 2;
+      }
+      
+      ctx.fillStyle = '#444';
+      ctx.font = 'bold 13px Arial';
+      ctx.shadowColor = 'rgba(0,0,0,0.1)';
+      ctx.shadowBlur = 1;
+      ctx.fillText('Bed Sheet', x + w/2, y + h/2);
+      break;
+      
+    case 'pillow':
+      // Fluffy pillow with depth
+      const gradient3 = ctx.createRadialGradient(x + w/2, y + h/2, 10, x + w/2, y + h/2, w/2);
+      gradient3.addColorStop(0, '#ffffff');
+      gradient3.addColorStop(0.7, '#f8f8f8');
+      gradient3.addColorStop(1, '#e8e8e8');
+      ctx.fillStyle = gradient3;
+      ctx.fillRect(x, y, w, h);
+      
+      // Rounded pillow effect
+      ctx.strokeStyle = '#d0d0d0';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x + 8, y);
+      ctx.lineTo(x + w - 8, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + 8);
+      ctx.lineTo(x + w, y + h - 8);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - 8, y + h);
+      ctx.lineTo(x + 8, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - 8);
+      ctx.lineTo(x, y + 8);
+      ctx.quadraticCurveTo(x, y, x + 8, y);
+      ctx.stroke();
+      
+      // Add fluffy texture dots
+      ctx.fillStyle = 'rgba(230, 230, 230, 0.5)';
+      for (let i = 0; i < 30; i++) {
+        const px = x + 10 + Math.random() * (w - 20);
+        const py = y + 10 + Math.random() * (h - 20);
+        ctx.beginPath();
+        ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      
+      ctx.fillStyle = '#666';
+      ctx.font = 'bold 13px Arial';
+      ctx.shadowColor = 'rgba(0,0,0,0.1)';
+      ctx.fillText('Pillow', x + w/2, y + h/2);
+      break;
+      
+    case 'pillowcase':
+      // Crisp pillowcase with opening
+      ctx.fillStyle = '#fafafa';
+      ctx.fillRect(x, y, w, h);
+      
+      // Double stitched border
+      ctx.strokeStyle = '#d8d8d8';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x + 3, y + 3, w - 6, h - 6);
+      ctx.strokeRect(x + 5, y + 5, w - 10, h - 10);
+      
+      // Opening flap with depth
+      const gradient4 = ctx.createLinearGradient(x + w - 25, y, x + w, y);
+      gradient4.addColorStop(0, '#e0e0e0');
+      gradient4.addColorStop(1, '#c8c8c8');
+      ctx.fillStyle = gradient4;
+      ctx.fillRect(x + w - 22, y + 5, 17, h - 10);
+      
+      // Flap stitching
+      ctx.strokeStyle = '#b0b0b0';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x + w - 22, y + 5);
+      ctx.lineTo(x + w - 22, y + h - 5);
+      ctx.stroke();
+      
+      ctx.fillStyle = '#555';
+      ctx.font = 'bold 11px Arial';
+      ctx.shadowColor = 'rgba(0,0,0,0.05)';
+      ctx.fillText('Pillowcase', x + w/2 - 5, y + h/2);
+      break;
+      
+    case 'blanket':
+      // Knitted/woven blanket texture
+      const gradient5 = ctx.createLinearGradient(x, y, x, y + h);
+      gradient5.addColorStop(0, '#c8dce8');
+      gradient5.addColorStop(0.5, '#b0cfe0');
+      gradient5.addColorStop(1, '#a0c0d8');
+      ctx.fillStyle = gradient5;
+      ctx.fillRect(x, y, w, h);
+      
+      // Woven pattern
+      ctx.strokeStyle = 'rgba(144, 180, 200, 0.6)';
+      ctx.lineWidth = 1;
+      // Horizontal threads
+      for (let j = 0; j < h; j += 4) {
+        ctx.beginPath();
+        ctx.moveTo(x, y + j);
+        ctx.lineTo(x + w, y + j);
+        ctx.stroke();
+      }
+      // Vertical threads
+      ctx.strokeStyle = 'rgba(144, 180, 200, 0.4)';
+      for (let i = 0; i < w; i += 4) {
+        ctx.beginPath();
+        ctx.moveTo(x + i, y);
+        ctx.lineTo(x + i, y + h);
+        ctx.stroke();
+      }
+      
+      // Blanket border
+      ctx.strokeStyle = '#80a0c0';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(x + 2, y + 2, w - 4, h - 4);
+      
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 13px Arial';
+      ctx.shadowColor = 'rgba(0,0,0,0.3)';
+      ctx.shadowBlur = 2;
+      ctx.fillText('Blanket', x + w/2, y + h/2);
+      break;
+      
+    case 'fitted_sheet':
+      // Sheet with visible elastic
+      const gradient6 = ctx.createLinearGradient(x, y, x + w, y);
+      gradient6.addColorStop(0, '#ffffff');
+      gradient6.addColorStop(0.5, '#f8f8f8');
+      gradient6.addColorStop(1, '#f0f0f0');
+      ctx.fillStyle = gradient6;
+      ctx.fillRect(x, y, w, h);
+      
+      // Sheet border
+      ctx.strokeStyle = '#e0e0e0';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(x + 3, y + 3, w - 6, h - 6);
+      
+      // Elastic corners with shine
+      const cornerSize = 10;
+      const corners = [
+        {x: x + 3, y: y + 3},
+        {x: x + w - 13, y: y + 3},
+        {x: x + 3, y: y + h - 13},
+        {x: x + w - 13, y: y + h - 13}
+      ];
+      
+      corners.forEach(corner => {
+        const gradElastic = ctx.createLinearGradient(corner.x, corner.y, corner.x + cornerSize, corner.y + cornerSize);
+        gradElastic.addColorStop(0, '#555');
+        gradElastic.addColorStop(0.5, '#666');
+        gradElastic.addColorStop(1, '#444');
+        ctx.fillStyle = gradElastic;
+        ctx.fillRect(corner.x, corner.y, cornerSize, cornerSize);
+        
+        // Elastic lines
+        ctx.strokeStyle = '#777';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          ctx.moveTo(corner.x + 2 + i * 3, corner.y);
+          ctx.lineTo(corner.x + 2 + i * 3, corner.y + cornerSize);
+          ctx.stroke();
+        }
+      });
+      
+      ctx.fillStyle = '#444';
+      ctx.font = 'bold 11px Arial';
+      ctx.shadowColor = 'rgba(255,255,255,0.5)';
+      ctx.fillText('Fitted Sheet', x + w/2, y + h/2);
+      break;
+      
+    case 'bed_pad':
+      // Absorbent waterproof pad
+      const gradient7 = ctx.createLinearGradient(x, y, x, y + h);
+      gradient7.addColorStop(0, '#e0f0e0');
+      gradient7.addColorStop(0.5, '#d0e8d0');
+      gradient7.addColorStop(1, '#c0e0c0');
+      ctx.fillStyle = gradient7;
+      ctx.fillRect(x, y, w, h);
+      
+      // Quilted absorbent pattern
+      ctx.strokeStyle = 'rgba(160, 200, 160, 0.5)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < w; i += 15) {
+        for (let j = 0; j < h; j += 15) {
+          ctx.beginPath();
+          ctx.arc(x + i + 7, y + j + 7, 5, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+      
+      // Waterproof border
+      ctx.strokeStyle = '#90c090';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 3]);
+      ctx.strokeRect(x + 4, y + 4, w - 8, h - 8);
+      ctx.setLineDash([]);
+      
+      ctx.fillStyle = '#337733';
+      ctx.font = 'bold 11px Arial';
+      ctx.shadowColor = 'rgba(255,255,255,0.7)';
+      ctx.fillText('Bed Pad', x + w/2, y + h/2);
+      break;
+      
+    case 'bed_rail':
+      // Metal safety rail with shine
+      const gradient8 = ctx.createLinearGradient(x, y, x + w, y);
+      gradient8.addColorStop(0, '#d8d8d8');
+      gradient8.addColorStop(0.3, '#e8e8e8');
+      gradient8.addColorStop(0.5, '#c8c8c8');
+      gradient8.addColorStop(0.7, '#e0e0e0');
+      gradient8.addColorStop(1, '#d0d0d0');
+      ctx.fillStyle = gradient8;
+      ctx.fillRect(x, y, w, h);
+      
+      // Metal bars with 3D effect
+      const numBars = 5;
+      for (let i = 0; i < numBars; i++) {
+        const barX = x + (w / numBars) * i + 8;
+        const barGrad = ctx.createLinearGradient(barX, y, barX + 6, y);
+        barGrad.addColorStop(0, '#a8a8a8');
+        barGrad.addColorStop(0.5, '#c8c8c8');
+        barGrad.addColorStop(1, '#989898');
+        ctx.fillStyle = barGrad;
+        ctx.fillRect(barX, y + 3, 6, h - 6);
+        
+        // Highlight on bars
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.fillRect(barX + 1, y + 3, 2, h - 6);
+      }
+      
+      // Top and bottom rails
+      ctx.fillStyle = '#b0b0b0';
+      ctx.fillRect(x, y, w, 4);
+      ctx.fillRect(x, y + h - 4, w, 4);
+      
+      ctx.fillStyle = '#222';
+      ctx.font = 'bold 11px Arial';
+      ctx.shadowColor = 'rgba(255,255,255,0.6)';
+      ctx.fillText('Bed Rail', x + w/2, y + h/2);
+      break;
+      
+    case 'headboard':
+      // Tufted upholstered headboard
+      const gradient9 = ctx.createLinearGradient(x, y, x, y + h);
+      gradient9.addColorStop(0, '#9b8070');
+      gradient9.addColorStop(0.5, '#8b7060');
+      gradient9.addColorStop(1, '#7b6050');
+      ctx.fillStyle = gradient9;
+      ctx.fillRect(x, y, w, h);
+      
+      // Tufted button pattern with 3D depth
+      const buttonRows = 3;
+      const buttonCols = 4;
+      for (let row = 0; row < buttonRows; row++) {
+        for (let col = 0; col < buttonCols; col++) {
+          const btnX = x + (w / (buttonCols + 1)) * (col + 1);
+          const btnY = y + (h / (buttonRows + 1)) * (row + 1);
+          
+          // Diamond tufting
+          ctx.strokeStyle = '#5b4030';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(btnX, btnY - 8);
+          ctx.lineTo(btnX + 8, btnY);
+          ctx.lineTo(btnX, btnY + 8);
+          ctx.lineTo(btnX - 8, btnY);
+          ctx.closePath();
+          ctx.stroke();
+          
+          // Button center
+          const btnGrad = ctx.createRadialGradient(btnX, btnY, 0, btnX, btnY, 5);
+          btnGrad.addColorStop(0, '#6b5040');
+          btnGrad.addColorStop(1, '#4b3020');
+          ctx.fillStyle = btnGrad;
+          ctx.beginPath();
+          ctx.arc(btnX, btnY, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      
+      // Border trim
+      ctx.strokeStyle = '#5b4030';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(x + 2, y + 2, w - 4, h - 4);
+      
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px Arial';
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 2;
+      ctx.fillText('Headboard', x + w/2, y + h - 15);
+      break;
+      
+    case 'footboard':
+      // Wood-grain footboard
+      const gradient10 = ctx.createLinearGradient(x, y, x, y + h);
+      gradient10.addColorStop(0, '#9b7860');
+      gradient10.addColorStop(0.5, '#8b6850');
+      gradient10.addColorStop(1, '#7b5840');
+      ctx.fillStyle = gradient10;
+      ctx.fillRect(x, y, w, h);
+      
+      // Wood grain lines
+      ctx.strokeStyle = 'rgba(107, 78, 60, 0.3)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 8; i++) {
+        const grainY = y + Math.random() * h;
+        ctx.beginPath();
+        ctx.moveTo(x, grainY);
+        ctx.quadraticCurveTo(x + w/2, grainY + (Math.random() - 0.5) * 10, x + w, grainY + (Math.random() - 0.5) * 5);
+        ctx.stroke();
+      }
+      
+      // Panel frame
+      ctx.strokeStyle = '#5b3820';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(x + 3, y + 3, w - 6, h - 6);
+      
+      // Inner panel
+      ctx.strokeStyle = '#6b4830';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x + 8, y + 8, w - 16, h - 16);
+      
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px Arial';
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 2;
+      ctx.fillText('Footboard', x + w/2, y + h/2);
+      break;
+      
+    default:
+      // Default fallback
+      ctx.fillStyle = '#cccccc';
+      ctx.fillRect(x, y, w, h);
+      ctx.fillStyle = '#333333';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(o.id, x + w / 2, y + h / 2);
+  }
+  
+  ctx.restore();
+}
+
+function drawNPC(npc) {
+  const x = npc.gridX * GRID_SIZE;
+  const y = npc.gridY * GRID_SIZE;
+  
+  const isHovered = hoveredNPC && hoveredNPC.id === npc.id;
+  
+  // Shadow - positioned closer to the NPC's feet
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  ctx.beginPath();
+  ctx.ellipse(x + NPC_WIDTH/2, y + NPC_HEIGHT - 4, NPC_WIDTH/2.5, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Walking animation: bob up and down when moving
+  let yOffset = 0;
+  let xOffset = 0;
+  let rotation = 0;
+  
+  if (npc.isMoving) {
+    // Create bobbing effect based on animation frame
+    const bobAmount = 3;
+    if (npc.animFrame === 1) {
+      yOffset = -bobAmount; // Mid-step: lift up
+    } else if (npc.animFrame === 0 || npc.animFrame === 2) {
+      yOffset = 0; // Feet on ground
+    }
+    
+    // Add slight tilt based on direction
+    if (npc.dir === 'left') {
+      rotation = -0.05;
+      xOffset = -1;
+    } else if (npc.dir === 'right') {
+      rotation = 0.05;
+      xOffset = 1;
+    } else if (npc.dir === 'up') {
+      yOffset -= 1;
+    } else if (npc.dir === 'down') {
+      yOffset += 1;
+    }
+  }
+  
+  const npcImg = images[npc.sprite];
+  
+  // Save context state
+  ctx.save();
+  
+  // Draw the actual NPC with thick, smooth light blue glow if hovered
+  if (npcImg && npcImg.complete) {
+    // Draw thick light blue glow if hovered (before the actual NPC)
+    if (isHovered) {
+      const offsets = [
+        // Cardinals (main directions) - increased range
+        [-4, 0], [4, 0], [0, -4], [0, 4],
+        [-3, 0], [3, 0], [0, -3], [0, 3],
+        [-2, 0], [2, 0], [0, -2], [0, 2],
+        [-1, 0], [1, 0], [0, -1], [0, 1],
+        // Diagonals for smoothness - increased range
+        [-3, -3], [3, -3], [-3, 3], [3, 3],
+        [-3, -2], [3, -2], [-3, 2], [3, 2],
+        [-2, -3], [2, -3], [-2, 3], [2, 3],
+        [-2, -2], [2, -2], [-2, 2], [2, 2],
+        [-2, -1], [2, -1], [-2, 1], [2, 1],
+        [-1, -2], [1, -2], [-1, 2], [1, 2],
+        [-1, -1], [1, -1], [-1, 1], [1, 1]
+      ];
+      
+      for (let [offsetX, offsetY] of offsets) {
+        ctx.shadowColor = 'rgba(100, 180, 255, 1)';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = offsetX;
+        ctx.shadowOffsetY = offsetY;
+        
+        if (rotation !== 0) {
+          ctx.save();
+          ctx.translate(x + NPC_WIDTH/2, y + NPC_HEIGHT/2 + yOffset);
+          ctx.rotate(rotation);
+          ctx.drawImage(npcImg, -NPC_WIDTH/2 + xOffset, -NPC_HEIGHT/2, NPC_WIDTH, NPC_HEIGHT);
+          ctx.restore();
+        } else {
+          ctx.drawImage(npcImg, x + xOffset, y + yOffset, NPC_WIDTH, NPC_HEIGHT);
+        }
+      }
+    }
+    
+    // Reset all shadow properties before drawing the actual NPC
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    
+    // Draw the actual NPC normally
+    if (rotation !== 0) {
+      ctx.save();
+      ctx.translate(x + NPC_WIDTH/2, y + NPC_HEIGHT/2 + yOffset);
+      ctx.rotate(rotation);
+      ctx.drawImage(npcImg, -NPC_WIDTH/2 + xOffset, -NPC_HEIGHT/2, NPC_WIDTH, NPC_HEIGHT);
+      ctx.restore();
+    } else {
+      ctx.drawImage(npcImg, x + xOffset, y + yOffset, NPC_WIDTH, NPC_HEIGHT);
+    }
+  } else {
+    // Fallback placeholder
+    ctx.fillStyle = '#e74c3c';
+    ctx.fillRect(x, y + yOffset, NPC_WIDTH, NPC_HEIGHT);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('NPC', x + NPC_WIDTH/2, y + NPC_HEIGHT/2 + yOffset);
+    
+    // Thick light blue rectangle outline for placeholder
+    if (isHovered) {
+      ctx.strokeStyle = 'rgba(100, 180, 255, 1)';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(x, y, NPC_WIDTH, NPC_HEIGHT);
+    }
+  }
+  
+  // Restore context state
+  ctx.restore();
+}
+
+function drawMario() {
+  const x = char.gridX * GRID_SIZE + (GRID_SIZE - W) / 2;
+  const y = char.gridY * GRID_SIZE + (GRID_SIZE - H);
+  
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  ctx.beginPath();
+  ctx.ellipse(x + W / 2, y + H + 2, 18, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  let spriteKey = 'mario_';
+  
+  if (keyPressed) {
+    spriteKey += `walk${char.animFrame + 1}_${char.dir}`;
+  } else {
+    spriteKey += `idle_${char.dir}`;
+  }
+  
+  const marioImg = images[spriteKey];
+  if (marioImg && marioImg.complete) {
+    ctx.drawImage(marioImg, x, y, W, H);
+  } else {
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(x, y, W, H);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 20px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('M', x + W / 2, y + H / 2);
+  }
+}
+
+// ============================================
+// POPUP SYSTEM
+// ============================================
+function showPopup() {
+  if (!sel || sel.complaint) return;
+  
+  let html = '<h2>Object Information</h2>';
+  
+  html += '<div class="lang-grid">';
+  selectedLangs.forEach((lang) => {
+    const info = langInfo[lang];
+    const data = sel[lang];
+    html += `
+      <div class="lang">
+        <h3>${info.flag} ${info.name}</h3>
+        <div class="name">${data.name}</div>
+        <div class="desc">${data.description}</div>
+        <div class="ex">${data.example}</div>
+        <button class="tts" id="tts-${lang}" onclick="speak('${lang}', this)">🔊 Listen</button>
+      </div>
+    `;
+  });
+  html += '</div>';
+  
+  // Add detail buttons for objects with hasDetailView
+  if (sel.hasDetailView) {
+    if (sel.id === 'bed') {
+      html += `
+        <button class="tts" style="background: #3498db; margin-top: 12px;" onclick="viewBedDetails()">
+          🛏️ View Bed Components
+        </button>
+      `;
+    } else if (sel.id === 'stove') {
+      html += `
+        <button class="tts" style="background: #e67e22; margin-top: 12px;" onclick="viewStoveDetails()">
+          🔥 View Stove Components
+        </button>
+      `;
+    } else if (sel.id === 'refrigerator') {
+      html += `
+        <button class="tts" style="background: #3498db; margin-top: 12px;" onclick="viewRefrigeratorDetails()">
+          ❄️ View Refrigerator Components
+        </button>
+      `;
+    } else if (sel.id === 'med_cabinet') {
+      html += `
+        <button class="tts" style="background: #e74c3c; margin-top: 12px;" onclick="viewMedCabinetDetails()">
+          💊 View Medical Cabinet Contents
+        </button>
+      `;
+    } else if (sel.id === 'pantry') {
+      html += `
+        <button class="tts" style="background: #f39c12; margin-top: 12px;" onclick="viewPantryDetails()">
+          🥫 View Pantry Groceries
+        </button>
+      `;
+    }
+  }
+  
+  document.getElementById('popupContent').innerHTML = html;
+  document.getElementById('popupOverlay').classList.add('show');
+}
+
+function showNPCPopup() {
+  if (!sel || !sel.complaint) return;
+  
+  let html = '<h2>Patient Complaint</h2>';
+  
+  html += '<div class="lang-grid">';
+  selectedLangs.forEach((lang) => {
+    const info = langInfo[lang];
+    const data = sel.complaint[lang];
+    html += `
+      <div class="lang">
+        <h3>${info.flag} ${info.name}</h3>
+        <div class="name">${data.name}</div>
+        <div class="symptom">
+          <div class="symptom-title">Symptoms:</div>
+          <div class="symptom-text">${data.complaint}</div>
+        </div>
+        <button class="tts" id="tts-npc-${lang}" onclick="speakNPC('${lang}', this)">🔊 Listen</button>
+      </div>
+    `;
+  });
+  html += '</div>';
+  
+  document.getElementById('popupContent').innerHTML = html;
+  document.getElementById('popupOverlay').classList.add('show');
+}
+
+function closePopup(event) {
+  if (event && event.target !== event.currentTarget && event.type !== 'click') return;
+  
+  document.getElementById('popupOverlay').classList.remove('show');
+  
+  // Also close the showcase if it's open
+  document.getElementById('showcaseOverlay').classList.remove('show');
+  
+  if (currentAudio) {
+    window.speechSynthesis.cancel();
+    currentAudio = null;
+    playingLang = null;
+  }
+}
+
+// ============================================
+// TEXT-TO-SPEECH
+// ============================================
+// ============================================
+// AI-POWERED FEATURES
+// Enhanced translation and text-to-speech
+// ============================================
+let useAITranslation = true; // Toggle AI-enhanced translations
+let aiTranslationCache = {}; // Cache AI translations to avoid repeated calls
+
+// Translate text using Claude AI for more natural, context-aware translations
+async function translateWithAI(text, targetLang, context = 'medical') {
+  const cacheKey = `${text}_${targetLang}`;
+  if (aiTranslationCache[cacheKey]) {
+    return aiTranslationCache[cacheKey];
+  }
+  
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        messages: [{
+          role: "user",
+          content: `You are a professional medical translator. Translate the following ${context} text to ${targetLang}. Provide ONLY the translation, no explanations.
+
+Text to translate: "${text}"
+
+Translation:`
+        }]
+      })
+    });
+    
+    const data = await response.json();
+    const translation = data.content[0].text.trim();
+    
+    // Cache the result
+    aiTranslationCache[cacheKey] = translation;
+    return translation;
+    
+  } catch (error) {
+    console.warn('AI translation failed, using fallback:', error);
+    return text; // Fallback to original text
+  }
+}
+
+// Enhanced TTS with better pronunciation using Claude to phonetically improve text
+async function enhancedSpeak(text, lang, button) {
+  if (!text) return;
+  
+  // Stop current audio
+  if (currentAudio && playingLang === lang) {
+    window.speechSynthesis.cancel();
+    button.classList.remove('playing');
+    button.innerHTML = '🔊 Listen';
+    currentAudio = null;
+    playingLang = null;
+    return;
+  }
+  
+  if (currentAudio) {
+    window.speechSynthesis.cancel();
+  }
+  
+  button.classList.add('playing');
+  button.innerHTML = '⏹️ Loading...';
+  
+  // Use AI to create more natural, spoken version of the text
+  let spokenText = text;
+  if (useAITranslation) {
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 500,
+          messages: [{
+            role: "user",
+            content: `Convert this medical text into natural, easy-to-pronounce spoken ${langInfo[lang].name}. Make it flow naturally for text-to-speech. Return ONLY the optimized text:
+
+"${text}"`
+          }]
+        })
+      });
+      
+      const data = await response.json();
+      spokenText = data.content[0].text.trim();
+      
+    } catch (error) {
+      console.warn('AI enhancement failed, using original text:', error);
+    }
+  }
+  
+  // Create utterance with enhanced text
+  const u = new SpeechSynthesisUtterance(spokenText);
+  u.lang = langInfo[lang].code;
+  u.rate = 0.85;  // Slightly slower for clarity
+  u.pitch = 1.0;
+  u.volume = 1.0;
+  
+  // Select best voice
+  const voices = window.speechSynthesis.getVoices();
+  const voiceName = langInfo[lang].voiceName;
+  let selectedVoice = voices.find(v => v.name.includes(voiceName));
+  
+  if (!selectedVoice) {
+    selectedVoice = voices.find(v => 
+      v.lang.startsWith(langInfo[lang].code.split('-')[0]) && 
+      !v.name.toLowerCase().includes('espeak')
+    );
+  }
+  
+  if (selectedVoice) {
+    u.voice = selectedVoice;
+  }
+  
+  button.innerHTML = '⏸️ Stop';
+  currentAudio = u;
+  playingLang = lang;
+  
+  u.onend = () => {
+    button.classList.remove('playing');
+    button.innerHTML = '🔊 Listen';
+    currentAudio = null;
+    playingLang = null;
+  };
+  
+  u.onerror = () => {
+    button.classList.remove('playing');
+    button.innerHTML = '🔊 Listen';
+    currentAudio = null;
+    playingLang = null;
+  };
+  
+  window.speechSynthesis.speak(u);
+}
+
+function speak(lang, button) {
+  if (!sel) return;
+  
+  const d = sel[lang];
+  const t = `${d.name}. ${d.description} ${d.example}`;
+  
+  // Use enhanced AI-powered speech
+  enhancedSpeak(t, lang, button);
+}
+
+function speakNPC(lang, button) {
+  if (!sel || !sel.complaint) return;
+  
+  const d = sel.complaint[lang];
+  const t = `${d.name}. ${d.complaint}`;
+  
+  // Use enhanced AI-powered speech for NPCs too
+  enhancedSpeak(t, lang, button);
+}
+
+// ============================================
+// SHOWCASE SYSTEM
+// ============================================
+function viewBedDetails() {
+  closePopup();
+  showShowcase('bed', '🛏️ Bed Components');
+}
+
+function viewStoveDetails() {
+  closePopup();
+  showShowcase('stove', '🔥 Stove Components');
+}
+
+function viewRefrigeratorDetails() {
+  closePopup();
+  showShowcase('refrigerator', '❄️ Refrigerator Components');
+}
+
+function viewMedCabinetDetails() {
+  closePopup();
+  showShowcase('med_cabinet', '💊 Medical Cabinet Contents');
+}
+
+function viewPantryDetails() {
+  closePopup();
+  showShowcase('pantry', '🥫 Pantry Groceries');
+}
+
+function showShowcase(type, title) {
+  const components = showcaseData[type];
+  if (!components) return;
+  
+  // Make sure regular popup is closed
+  document.getElementById('popupOverlay').classList.remove('show');
+  
+  let html = `<h2>${title}</h2>`;
+  html += '<div class="showcase-grid">';
+  
+  components.forEach((component) => {
+    const imgSrc = imageUrls[component.img];
+    
+    // Build name display with both selected languages
+    let nameDisplay = '';
+    selectedLangs.forEach((lang, index) => {
+      const data = component[lang];
+      nameDisplay += data.name;
+      if (index < selectedLangs.length - 1) {
+        nameDisplay += ' / ';
+      }
+    });
+    
+    // Get placeholder info
+    const placeholder = getPlaceholderIcon(component.img);
+    
+    html += `
+      <div class="showcase-item" onclick="showComponentDetail('${type}', '${component.img}')">
+        <div class="showcase-item-image-wrapper" style="background: ${placeholder.color};">
+          <img src="${imgSrc}" alt="${nameDisplay}" class="showcase-item-image" 
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="showcase-placeholder" style="display: none;">
+            <span style="font-size: 48px;">${placeholder.icon}</span>
+          </div>
+        </div>
+        <div class="showcase-item-name">${nameDisplay}</div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  
+  document.getElementById('showcaseContent').innerHTML = html;
+  document.getElementById('showcaseOverlay').classList.add('show');
+}
+
+function getPlaceholderIcon(componentName) {
+  const placeholders = {
+    // Bed components
+    'mattress': { icon: '🛏️', color: '#e3f2fd' },
+    'bedsheet': { icon: '📄', color: '#f3e5f5' },
+    'pillow': { icon: '🛏️', color: '#fff3e0' },
+    'pillowcase': { icon: '📋', color: '#e8f5e9' },
+    'blanket': { icon: '🧵', color: '#fce4ec' },
+    'fitted_sheet': { icon: '📄', color: '#e0f2f1' },
+    'bed_pad': { icon: '📋', color: '#fff9c4' },
+    'bed_rail': { icon: '🔒', color: '#f1f8e9' },
+    'headboard': { icon: '🪑', color: '#e8eaf6' },
+    'footboard': { icon: '🪑', color: '#ede7f6' },
+    
+    // Stove components
+    'burner': { icon: '🔥', color: '#ffebee' },
+    'oven': { icon: '📦', color: '#e3f2fd' },
+    'oven_rack': { icon: '▦', color: '#f3e5f5' },
+    'control_knobs': { icon: '🎛️', color: '#e0f7fa' },
+    'drip_pan': { icon: '🍳', color: '#fff3e0' },
+    'broiler': { icon: '🔥', color: '#fce4ec' },
+    'timer': { icon: '⏱️', color: '#f1f8e9' },
+    'vent_hood': { icon: '💨', color: '#e8eaf6' },
+    
+    // Refrigerator components
+    'fridge_shelf': { icon: '▬', color: '#e3f2fd' },
+    'crisper_drawer': { icon: '🥬', color: '#e8f5e9' },
+    'door_shelf': { icon: '🚪', color: '#f3e5f5' },
+    'freezer_compartment': { icon: '❄️', color: '#e0f7fa' },
+    'ice_maker': { icon: '🧊', color: '#e1f5fe' },
+    'temperature_control': { icon: '🌡️', color: '#fff3e0' },
+    'fridge_light': { icon: '💡', color: '#fff9c4' },
+    'butter_compartment': { icon: '🧈', color: '#fff8e1' },
+    
+    // Medical cabinet components
+    'syringe': { icon: '💉', color: '#ffebee' },
+    'bandages': { icon: '🩹', color: '#fce4ec' },
+    'gauze': { icon: '📋', color: '#f3e5f5' },
+    'antiseptic': { icon: '🧴', color: '#e8f5e9' },
+    'thermometer': { icon: '🌡️', color: '#e3f2fd' },
+    'medical_gloves': { icon: '🧤', color: '#f1f8e9' },
+    'medical_scissors': { icon: '✂️', color: '#e0f2f1' },
+    'medical_tape': { icon: '📼', color: '#fff3e0' },
+    'cotton_balls': { icon: '⚪', color: '#fafafa' },
+    'alcohol_wipes': { icon: '🧻', color: '#e8eaf6' },
+    
+    // Pantry groceries
+    'rice': { icon: '🍚', color: '#fff9c4' },
+    'pasta': { icon: '🍝', color: '#fff3e0' },
+    'canned_beans': { icon: '🥫', color: '#e8f5e9' },
+    'canned_soup': { icon: '🥫', color: '#ffebee' },
+    'bread': { icon: '🍞', color: '#fff8e1' },
+    'cereal': { icon: '🥣', color: '#f3e5f5' },
+    'flour': { icon: '🧂', color: '#fafafa' },
+    'sugar': { icon: '🧂', color: '#f3e5f5' },
+    'cooking_oil': { icon: '🧴', color: '#fff9c4' },
+    'salt': { icon: '🧂', color: '#e0f2f1' }
+  };
+  
+  return placeholders[componentName] || { icon: '📦', color: '#e0e0e0' };
+}
+
+function showComponentDetail(showcaseType, componentImg) {
+  const components = showcaseData[showcaseType];
+  const component = components.find(c => c.img === componentImg);
+  if (!component) return;
+  
+  // Close showcase and show in regular popup with full language support
+  closeShowcase();
+  
+  let html = '<h2>Component Details</h2>';
+  html += '<div class="lang-grid">';
+  
+  selectedLangs.forEach((lang) => {
+    const info = langInfo[lang];
+    const data = component[lang];
+    html += `
+      <div class="lang">
+        <h3>${info.flag} ${info.name}</h3>
+        <div class="name">${data.name}</div>
+        <div class="desc">${data.description}</div>
+        <button class="tts" id="tts-comp-${lang}" onclick="speakComponent('${showcaseType}', '${componentImg}', '${lang}', this)">🔊 Listen</button>
+      </div>
+    `;
+  });
+  html += '</div>';
+  
+  html += `<button class="tts" style="background: #666; margin-top: 12px;" onclick="showShowcase('${showcaseType}', getShowcaseTitle('${showcaseType}'))">← Back to Showcase</button>`;
+  
+  document.getElementById('popupContent').innerHTML = html;
+  document.getElementById('popupOverlay').classList.add('show');
+}
+
+function getShowcaseTitle(type) {
+  const titles = {
+    'bed': '🛏️ Bed Components',
+    'stove': '🔥 Stove Components',
+    'refrigerator': '❄️ Refrigerator Components',
+    'med_cabinet': '💊 Medical Cabinet Contents',
+    'pantry': '🥫 Pantry Groceries'
+  };
+  return titles[type] || 'Components';
+}
+
+function speakComponent(showcaseType, componentImg, lang, button) {
+  const components = showcaseData[showcaseType];
+  const component = components.find(c => c.img === componentImg);
+  if (!component) return;
+  
+  const data = component[lang];
+  const text = `${data.name}. ${data.description}`;
+  enhancedSpeak(text, lang, button);
+}
+
+function closeShowcase(event) {
+  if (event && event.target !== event.currentTarget && event.type !== 'click') return;
+  document.getElementById('showcaseOverlay').classList.remove('show');
+  
+  // Also close the regular popup if it's open
+  document.getElementById('popupOverlay').classList.remove('show');
+  
+  // Stop any playing audio
+  if (currentAudio) {
+    window.speechSynthesis.cancel();
+    currentAudio = null;
+    playingLang = null;
+  }
+}
+
+// ============================================
+// ROOM SWITCHING
+// ============================================
+function changeRoom(r) {
+  room = r;
+  char.gridX = 16;
+  char.gridY = 20;
+  char.dir = 'right';
+  char.animFrame = 0;
+  sel = null;
+  hoveredObject = null;
+  hoveredNPC = null;
+  
+  closePopup();
+  
+  if (currentAudio) {
+    window.speechSynthesis.cancel();
+    currentAudio = null;
+    playingLang = null;
+  }
+  
+  draw();
+  document.querySelectorAll('.room-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById(r + 'Btn');
+  if (btn) {
+    btn.classList.add('active');
+  }
+}
+</script>
+</body>
+</html>
